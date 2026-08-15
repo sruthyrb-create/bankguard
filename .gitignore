@@ -1,0 +1,20 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+# generated data and indexes (rebuilt from code)
+data/synth/bank.db
+data/policy/faiss.index
+data/policy/*.npy
+# raw traces (commit samples only)
+traces/*
+!traces/.gitkeep
+!traces/samples/
+# model weights / training outputs
+finetune/outputs/
+*.safetensors
+*.bin
+
+.env*
+!.env.example

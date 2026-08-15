@@ -1,0 +1,27 @@
+# All model IDs live here so swapping a model never means editing code.
+# Groq's model list changes; `make check` verifies these IDs exist.
+groq:
+  base_url: https://api.groq.com/openai/v1
+  api_key_env: GROQ_API_KEY
+  agent_model: openai/gpt-oss-120b   # teacher + strongest baseline (Apache-2.0)
+  judge_model: qwen/qwen3.8-27b      # different family from the teacher
+
+local:
+  base_url_env: LOCAL_LLM_BASE_URL
+  api_key_env: LOCAL_LLM_API_KEY
+  agent_model: Qwen/Qwen2.5-7B-Instruct-AWQ   # 4-bit to fit 8 GB VRAM; tested in Phase 3
+  agent_fallback: Qwen/Qwen2.5-3B-Instruct    # if 7B-AWQ does not fit (Qwen Research licence)
+  finetune_base: Qwen/Qwen2.5-1.5B-Instruct   # LoRA target; also the fp16 vs 4-bit benchmark model
+
+defaults:
+  temperature: 0.0
+  seed: 42
+  max_steps: 6
+  request_timeout_s: 60
+
+data:
+  db_path: data/synth/bank.db
+  seed: 42
+  n_customers: 200
+  days: 90
+  end_date: "2026-10-31"   # fixed so the dataset never depends on today's date

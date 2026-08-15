@@ -1,0 +1,16 @@
+# Core (Phase 0+). Pinned on 2026-11-13 by resolving on Python 3.11.
+# GPU/ML packages (torch, transformers, peft, trl, bitsandbytes,
+# sentence-transformers, faiss) are added in the phase that needs them.
+# vLLM lives in its own env (bankguard-vllm), see DECISIONS.md.
+fastapi==0.162.7
+uvicorn[standard]==0.54.0
+pydantic==2.14.3
+pyyaml==6.0.3
+python-dotenv==1.2.4
+openai==3.51.0
+httpx==0.28.1
+faker==40.54.0
+pandas==3.1.1
+numpy==2.4.6
+matplotlib==3.11.2
+pytest==9.2.0

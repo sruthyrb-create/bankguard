@@ -1,0 +1,11 @@
+# Each guardrail can be switched off to measure its effect (Phase 4+).
+input:
+  pii_masking: true
+  injection_classifier: true
+  injection_threshold: null   # chosen on a dev set in Phase 4, logged in DECISIONS.md
+  topic_filter: true
+output:
+  schema_check: true
+  grounding_check: true
+  pii_leak_check: true
+  action_policy: true
