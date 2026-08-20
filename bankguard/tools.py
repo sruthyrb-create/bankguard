@@ -32,6 +32,7 @@ class ToolContext:
     db_path: str | Path
     account_id: str
     now: datetime = field(default_factory=lambda: datetime(2026, 11, 2, 9, 0, 0))
+    policy_index: Any = None  # a PolicyIndex; None means load the on-disk index lazily
 
 
 def _authorize(ctx: ToolContext, account_id: str) -> None:
@@ -149,9 +150,31 @@ def open_dispute(ctx: ToolContext, account_id: str, transaction_id: str, reason:
     }
 
 
+_POLICY_INDEX: Any = None
+
+
+def _default_policy_index() -> Any:
+    """Load the on-disk FAISS index once per process (the embedding model is slow to load)."""
+    global _POLICY_INDEX
+    if _POLICY_INDEX is None:
+        from bankguard.config import REPO_ROOT, load_yaml
+        from bankguard.policy import PolicyIndex, sentence_transformer_embedder
+
+        cfg = load_yaml("models")["policy"]
+        index_path = REPO_ROOT / cfg["index_path"]
+        if not index_path.exists():
+            raise ToolError("Policy index not built; run `make index`.")
+        _POLICY_INDEX = PolicyIndex.load(REPO_ROOT / cfg["chunks_path"], index_path,
+                                         sentence_transformer_embedder(cfg["embed_model"]))
+    return _POLICY_INDEX
+
+
 def search_policy(ctx: ToolContext, query: str, k: int = 4) -> dict[str, Any]:
-    """Search Regulation E chunks. Implemented in Phase 2 (RAG index)."""
-    raise ToolError("search_policy is not available yet (built in Phase 2).")
+    """Search Regulation E chunks; the answer must cite the returned chunk ids."""
+    if not query.strip():
+        raise ToolError("query must not be empty.")
+    index = ctx.policy_index or _default_policy_index()
+    return {"query": query, "results": index.search(query, k)}
 
 
 _US_STATES = {

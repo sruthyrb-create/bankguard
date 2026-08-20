@@ -2,7 +2,7 @@
 
 A guarded, tool-using customer-support agent for **Northwind Bank** (fictional), with an evaluation harness, a red-team suite, LoRA fine-tuning and inference benchmarks. All data is synthetic.
 
-**Status:** Phase 1 (synthetic data + tools). Results tables are added in Phase 9 and every number comes from `results/*.json`.
+**Status:** Phase 2 (Reg E search index). Results tables are added in Phase 9 and every number comes from `results/*.json`.
 
 ## Setup (WSL2 / Linux)
 
@@ -13,6 +13,9 @@ make setup
 cp .env.example .env   # then add your GROQ_API_KEY
 make check
 make data
+make setup-ml
+make index
+make sanity
 make test
 ```
 

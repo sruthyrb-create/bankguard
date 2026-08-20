@@ -18,3 +18,9 @@ One line per decision, newest at the bottom.
 - 2026-11-13 Tools enforce authorization themselves (account_id must equal the session's account), not only the prompt; a prompt can be talked around, a code check cannot.
 - 2026-11-13 Reg E timeline in `open_dispute` counts business days as weekdays and ignores federal holidays (simplification, stated in the tool output).
 - 2026-11-13 `get_transactions` returns at most 50 rows (newest first) to keep tool output inside the model's context.
+- 2026-11-13 The bank.db hash can differ between machines (SQLite writes its version into the file); determinism is tested on row contents, which match for the same seed.
+- 2026-11-13 Reg E is fetched from the official eCFR API at a fixed snapshot date (2026-11-01), so chunk ids and citations are stable across rebuilds.
+- 2026-11-13 Only Subpart A (1005.1-1005.20) is indexed; remittance-transfer rules (Subpart B) are out of scope for a card/account support agent and would add off-topic retrieval hits. Official interpretations (Supplement I) are left out for now.
+- 2026-11-13 Chunks group paragraphs by top-level letter ((a), (b), ...) and split at 180 words, because all-MiniLM-L6-v2 truncates input at 256 tokens. Chunk ids look like `1005.11(c)#1`, readable enough to cite.
+- 2026-11-13 FAISS IndexFlatIP on L2-normalised embeddings (exact cosine search); a few hundred chunks need no approximate index.
+- 2026-11-13 PyTorch is installed from the CUDA 13.0 wheel index (needed for Blackwell sm_120) before the other ML packages; its exact version is pinned after the first install.

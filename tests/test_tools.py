@@ -108,4 +108,4 @@ def test_bad_args_become_errors(db: Path) -> None:
     ctx = ToolContext(db, aid)
     assert "Bad arguments" in call_tool(ctx, "get_transactions", {"acct": aid})["error"]
     assert "Unknown tool" in call_tool(ctx, "transfer_money", {})["error"]
-    assert "Phase 2" in call_tool(ctx, "search_policy", {"query": "error resolution"})["error"]
+    assert "empty" in call_tool(ctx, "search_policy", {"query": "  "})["error"]

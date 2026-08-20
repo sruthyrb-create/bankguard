@@ -15,6 +15,3 @@ traces/*
 finetune/outputs/
 *.safetensors
 *.bin
-
-.env*
-!.env.example

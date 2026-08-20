@@ -25,7 +25,7 @@ def main() -> None:
     for k, v in counts.items():
         print(f"  {k:13s} {v}")
     print(f"  anomaly rate  {counts['anomalies'] / counts['transactions']:.2%}")
-    print(f"  sha256[:16]   {digest}  (same seed -> same hash)")
+    print(f"  sha256[:16]   {digest}  (same seed + same SQLite version -> same hash)")
 
 
 if __name__ == "__main__":

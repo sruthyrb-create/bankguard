@@ -13,3 +13,10 @@
 - `bankguard/db.py`: SQLite schema (customers, accounts, transactions, flags, disputes).
 - `bankguard/tools.py`: `get_transactions`, `flag_unusual_charge`, `open_dispute` (with Reg E timeline), `search_policy` stub; JSON schemas; authorization check in code.
 - Tests for determinism, anomaly rate, no full card numbers, authorization, filters, writes and error handling.
+
+## Phase 2 (2026-11-13)
+- `bankguard/policy.py`: parse eCFR XML, chunk by paragraph letter, embed with all-MiniLM-L6-v2, search with FAISS.
+- `data/policy/build_index.py` (`make index`) and `scripts/sanity_policy.py` (`make sanity`, 5 queries).
+- `search_policy` tool now works and returns chunk ids to cite.
+- `requirements-ml.txt` and `make setup-ml` (CUDA 13.0 PyTorch first).
+- Offline tests for parsing, chunk ids and search, using a tiny XML fixture and a hashing embedder.

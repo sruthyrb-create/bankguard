@@ -25,3 +25,14 @@ data:
   n_customers: 200
   days: 90
   end_date: "2026-10-31"   # fixed so the dataset never depends on today's date
+
+policy:
+  ecfr_date: "2026-11-01"        # fixed snapshot date for reproducibility
+  part: "1005"                   # Regulation E
+  max_section: 20                # Subpart A only (1005.1-1005.20); remittance rules out of scope
+  embed_model: sentence-transformers/all-MiniLM-L6-v2
+  chunk_words: 180               # MiniLM truncates at 256 tokens; ~180 words stays under
+  raw_path: data/policy/reg_e.xml
+  text_path: data/policy/reg_e.txt
+  chunks_path: data/policy/chunks.jsonl
+  index_path: data/policy/faiss.index
