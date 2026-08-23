@@ -109,3 +109,53 @@ def test_bad_args_become_errors(db: Path) -> None:
     assert "Bad arguments" in call_tool(ctx, "get_transactions", {"acct": aid})["error"]
     assert "Unknown tool" in call_tool(ctx, "transfer_money", {})["error"]
     assert "empty" in call_tool(ctx, "search_policy", {"query": "  "})["error"]
+
+
+def test_reg_e_ninety_day_cases() -> None:
+    from datetime import date
+
+    from bankguard.tools import _ninety_day_reason
+
+    opened = date(2025, 1, 1)
+    base = {"state": "MI", "channel": "online", "ts": "2026-10-01T10:00:00"}
+    assert _ninety_day_reason(base, opened) is None
+    assert "US state" in _ninety_day_reason(base | {"state": "IS"}, opened)
+    assert "point-of-sale" in _ninety_day_reason(base | {"channel": "card_present"}, opened)
+    assert "30 days" in _ninety_day_reason(base, date(2026, 9, 20))
+
+
+def test_dispute_limit_matches_channel(db: Path) -> None:
+    conn = sqlite3.connect(db)
+    aid, online_txn = conn.execute(
+        "SELECT account_id, txn_id FROM transactions WHERE channel = 'online' AND state != 'IS' "
+        "AND state IN ('MI','CA','NY','TX','FL','OH','WA','IL','PA','GA') LIMIT 1").fetchone() or (None, None)
+    pos_txn = conn.execute("SELECT txn_id FROM transactions WHERE account_id = ? AND channel = 'card_present' LIMIT 1",
+                           (aid,)).fetchone()
+    conn.close()
+    if aid is None or pos_txn is None:
+        pytest.skip("fixture has no suitable transactions")
+    ctx = ToolContext(db, aid)
+    pos = call_tool(ctx, "open_dispute", {"account_id": aid, "transaction_id": pos_txn[0], "reason": "x"})
+    assert pos["timeline"]["investigation_limit"].startswith("90")
+
+
+def test_limit_parameter(db: Path) -> None:
+    aid = _first_account(db)
+    ctx = ToolContext(db, aid)
+    out = get_transactions(ctx, aid, limit=3)
+    assert len(out["transactions"]) == 3 and out["truncated"]
+    with pytest.raises(ToolError):
+        get_transactions(ctx, aid, limit=0)
+
+
+def test_optional_params_accept_null(db: Path) -> None:
+    """gpt-oss sends null for unset optional params; schemas and tools must accept it."""
+    for schema in TOOL_SCHEMAS:
+        params = schema["function"]["parameters"]
+        for name, spec in params["properties"].items():
+            if name not in params["required"]:
+                assert "null" in spec["type"], f"{schema['function']['name']}.{name} must allow null"
+    aid = _first_account(db)
+    out = call_tool(ToolContext(db, aid), "get_transactions",
+                    {"account_id": aid, "start_date": None, "end_date": None, "min_amount": None, "limit": None})
+    assert "error" not in out and out["count"] > 0

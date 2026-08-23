@@ -20,3 +20,14 @@
 - `search_policy` tool now works and returns chunk ids to cite.
 - `requirements-ml.txt` and `make setup-ml` (CUDA 13.0 PyTorch first).
 - Offline tests for parsing, chunk ids and search, using a tiny XML fixture and a hashing embedder.
+
+## Phase 3a (2026-11-13)
+- `bankguard/llm.py`: one OpenAI-compatible client for Groq and local vLLM, SDK retries, disk cache.
+- `bankguard/agent.py`: multi-turn tool-calling loop (max 6 steps), system prompt with tool rules.
+- `bankguard/tracing.py`: JSONL traces (llm_call, tool_call, final, error).
+- `bankguard/api.py`: FastAPI `/chat` (multi-turn via session_id) and `/health`.
+- `scripts/chat_cli.py`: interactive chat and a scripted 3-turn demo (`make demo`).
+- Offline tests with a scripted fake LLM for the loop, errors, max steps and the API.
+- Fix: Reg E 90-day extension cases in `open_dispute`; calendar-day labels; debit-only accounts (regenerate with `make data`).
+- Prompt rule: quote numbers and day counts exactly as retrieved. Policy index warmed before the first turn.
+- Fix: optional tool parameters accept null (root cause of the API 400). Groq `tool_use_failed` (400) is now retried with feedback instead of failing the turn; `limit` added to `get_transactions`; error details returned by the API; demo names the disputed transaction.

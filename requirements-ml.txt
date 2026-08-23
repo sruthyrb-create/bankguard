@@ -1,6 +1,7 @@
 # ML packages (Phase 2+). Install with `make setup-ml`, which installs the
 # CUDA 13.0 PyTorch build first (needed for the Blackwell RTX 5050), then these.
-# Resolved on Python 3.11 on 2026-11-13. torch is pinned after the first install.
+# Resolved on Python 3.11 on 2026-11-13.
+# torch==2.14.1+cu130 (verified on the RTX 5050, 2026-11-13) is installed by `make setup-ml`.
 sentence-transformers==6.3.0
 transformers==5.23.0
 huggingface-hub==2.4.0

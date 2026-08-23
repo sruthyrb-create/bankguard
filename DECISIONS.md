@@ -24,3 +24,19 @@ One line per decision, newest at the bottom.
 - 2026-11-13 Chunks group paragraphs by top-level letter ((a), (b), ...) and split at 180 words, because all-MiniLM-L6-v2 truncates input at 256 tokens. Chunk ids look like `1005.11(c)#1`, readable enough to cite.
 - 2026-11-13 FAISS IndexFlatIP on L2-normalised embeddings (exact cosine search); a few hundred chunks need no approximate index.
 - 2026-11-13 PyTorch is installed from the CUDA 13.0 wheel index (needed for Blackwell sm_120) before the other ML packages; its exact version is pinned after the first install.
+- 2026-11-13 PyTorch pinned to 2.14.1+cu130, the version verified with CUDA on the RTX 5050.
+- 2026-11-13 Retries use the OpenAI SDK's built-in exponential backoff (max_retries=4) instead of custom retry code.
+- 2026-11-13 LLM responses are cached on disk by a hash of the full request (model, messages, tools, temperature, seed), only at temperature 0; cached calls are marked `cached: true` in traces so latency metrics can exclude them.
+- 2026-11-13 The account id is put in the system prompt and also enforced by the tools; the prompt helps the model, the code check is what actually protects data.
+- 2026-11-13 Traces store result summaries (counts, chunk ids), not full transaction lists, to keep trace files small and free of bulk customer data.
+- 2026-11-13 Agent and API tests use a scripted fake LLM, so the loop logic is tested offline and deterministically; real-model behaviour is measured by the eval harness instead.
+- 2026-11-13 Phase 3 is split: 3a = agent, tracing and API on Groq; 3b = the same agent on a local vLLM server (separate env), so the Groq path is usable before the local setup.
+- 2026-11-13 Fix from the first Groq demo: `open_dispute` wrongly used 45 days for point-of-sale debit transactions. It now applies all three 90-day cases in 12 CFR 1005.11(c)(3)(ii) (not initiated in a US state, point-of-sale debit, within 30 days of first deposit) and labels limits as calendar days.
+- 2026-11-13 Accounts are now checking/savings with debit cards only. Regulation E covers debit/EFT accounts; credit-card disputes fall under Regulation Z, which this project does not model.
+- 2026-11-13 Observed failure in the first demo: gpt-oss-120b turned Reg E's 45/90 calendar days into "business days" while citing the correct chunks. Added a prompt rule to quote day counts as written; the eval set will include a scenario for this, because a citation check alone does not catch it.
+- 2026-11-13 The policy index (embedding model) is loaded before the first turn in the CLI and API, so the first policy question's latency does not include about 25 s of model loading.
+- 2026-11-13 Groq validates tool calls against the JSON schema and returns HTTP 400 `tool_use_failed` when the model's call doesn't match. The agent now catches this, tells the model why, and retries within max_steps; each rejection is traced and counted as an invalid tool call (a metric, per spec risk 17).
+- 2026-11-13 Added an optional `limit` (1-50) to `get_transactions`, because "show my last N transactions" is a natural request and the model reached for such a parameter.
+- 2026-11-13 The demo's second turn names the transaction id. When the user only says "the duplicate charge" and both charges are identical, asking which one is the correct behaviour; that case becomes an eval scenario.
+- 2026-11-13 Grounding checks must accept both [id] and 【id】 citation brackets; gpt-oss uses the latter.
+- 2026-11-13 Root cause of the API 400 (from the trace): gpt-oss-120b sent `null` for every unset optional parameter, and the schemas only allowed string/number. All optional parameters now accept null, and a test enforces it for every tool.

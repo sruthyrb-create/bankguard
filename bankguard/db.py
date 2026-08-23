@@ -17,7 +17,7 @@ CREATE TABLE customers (
 CREATE TABLE accounts (
     account_id   TEXT PRIMARY KEY,
     customer_id  TEXT NOT NULL REFERENCES customers(customer_id),
-    account_type TEXT NOT NULL,            -- checking | credit
+    account_type TEXT NOT NULL,            -- checking | savings (debit card; Regulation E applies)
     card_last4   TEXT NOT NULL,            -- last 4 digits only; no full card numbers exist
     opened_date  TEXT NOT NULL
 );

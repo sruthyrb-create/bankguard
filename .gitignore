@@ -15,3 +15,5 @@ traces/*
 finetune/outputs/
 *.safetensors
 *.bin
+# LLM response cache (re-runs without new API calls)
+.cache/

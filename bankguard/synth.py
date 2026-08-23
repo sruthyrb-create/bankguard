@@ -86,7 +86,7 @@ def generate(db_path: str | Path, cfg: SynthConfig = SynthConfig()) -> dict[str,
                 last4 = f"{rng.randint(0, 9999):04d}"
             used_last4.add(last4)
             opened = start - timedelta(days=rng.randint(30, 2000))
-            accounts.append((aid, cid, rng.choice(["checking", "credit"]), last4, opened.isoformat()))
+            accounts.append((aid, cid, rng.choice(["checking", "checking", "savings"]), last4, opened.isoformat()))
             favourites = rng.sample(MERCHANTS, k=rng.randint(5, 9))
             for d in range(cfg.days):
                 day = start + timedelta(days=d)
