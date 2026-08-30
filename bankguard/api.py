@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 from bankguard.agent import Agent, Session
 from bankguard.config import REPO_ROOT, load_yaml
+from bankguard.guardrails import Guardrails
 from bankguard.llm import make_llm
 from bankguard.tracing import Tracer
 
@@ -33,6 +34,8 @@ class ChatResponse(BaseModel):
     tool_calls: list[dict[str, Any]]
     latency_ms: int
     error: str | None = None
+    blocked_by: str | None = None
+    guardrail_events: list[dict[str, Any]] = []
 
 
 def create_app(agent_factory: Any = None, db_path: str | None = None) -> FastAPI:
@@ -43,11 +46,15 @@ def create_app(agent_factory: Any = None, db_path: str | None = None) -> FastAPI
     agents: dict[str, Agent] = {}
     sessions: dict[str, Session] = {}
 
+    guardrails: list[Guardrails] = []  # built once on first use (loads the injection classifier)
+
     def default_factory(backend: str) -> Agent:
         from bankguard.tools import _default_policy_index
 
+        if not guardrails:
+            guardrails.append(Guardrails.from_config())
         return Agent(make_llm(backend), db, tracer, cfg["defaults"]["max_steps"],
-                     policy_index=_default_policy_index())
+                     policy_index=_default_policy_index(), guardrails=guardrails[0])
 
     factory = agent_factory or default_factory
     app = FastAPI(title="BankGuard", description="Support agent for the fictional Northwind Bank")
@@ -80,7 +87,8 @@ def create_app(agent_factory: Any = None, db_path: str | None = None) -> FastAPI
             agents[req.backend] = factory(req.backend)
         result = agents[req.backend].run_turn(session, req.message)
         return ChatResponse(session_id=session.session_id, answer=result.answer, tool_calls=result.tool_calls,
-                            latency_ms=result.latency_ms, error=result.error)
+                            latency_ms=result.latency_ms, error=result.error, blocked_by=result.blocked_by,
+                            guardrail_events=result.guardrail_events)
 
     return app
 

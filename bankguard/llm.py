@@ -57,9 +57,11 @@ class LLMResponse:
     tool_calls: list[ToolCall] = field(default_factory=list)
     tokens_in: int = 0
     tokens_out: int = 0
-    latency_ms: int = 0
+    latency_ms: int = 0           # wall-clock time of this call, including SDK retries (cache read time if cached)
     finish_reason: str = ""
     cached: bool = False
+    server_ms: int | None = None  # provider-reported processing time (Groq usage.total_time), if any
+    retries: int | None = None    # SDK retries before success (429/5xx/timeouts), if the SDK reports it
 
 
 class LLMClient:
@@ -84,14 +86,18 @@ class LLMClient:
             payload["seed"] = self.seed
 
         path = self._cache_path(payload)
+        t0 = time.perf_counter()
         if self.use_cache and path.exists():
             data = json.loads(path.read_text(encoding="utf-8"))
             data["tool_calls"] = [ToolCall(**tc) for tc in data["tool_calls"]]
-            return LLMResponse(**data | {"cached": True})
+            # Report the time actually spent now, not the latency recorded when the response was cached.
+            data |= {"cached": True, "latency_ms": int((time.perf_counter() - t0) * 1000),
+                     "server_ms": None, "retries": 0}
+            return LLMResponse(**data)
 
-        t0 = time.perf_counter()
         try:
-            resp = self._client.chat.completions.create(**payload)
+            raw = self._client.chat.completions.with_raw_response.create(**payload)
+            resp = raw.parse()
         except BadRequestError as exc:
             tool_err = _as_tool_call_error(exc)
             if tool_err is not None:
@@ -108,6 +114,8 @@ class LLMClient:
             tokens_out=getattr(resp.usage, "completion_tokens", 0) or 0,
             latency_ms=latency_ms,
             finish_reason=choice.finish_reason or "",
+            server_ms=_server_ms(resp.usage),
+            retries=getattr(raw, "retries_taken", None),
         )
         if self.use_cache:
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -115,6 +123,14 @@ class LLMClient:
             data.pop("cached")
             path.write_text(json.dumps(data), encoding="utf-8")
         return out
+
+
+def _server_ms(usage: Any) -> int | None:
+    """Groq adds total_time (seconds) to usage; other servers don't. Wall time minus this ~= queueing + network
+    + client-side retry waits."""
+    extra = getattr(usage, "model_extra", None) or {}
+    total = extra.get("total_time", getattr(usage, "total_time", None))
+    return int(float(total) * 1000) if isinstance(total, (int, float)) else None
 
 
 def make_llm(backend: str, model: str | None = None, use_cache: bool = True) -> LLMClient:

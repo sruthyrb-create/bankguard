@@ -1,4 +1,4 @@
-.PHONY: setup setup-ml check test data index sanity demo chat serve
+.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails
 
 setup:            ## install pinned core dependencies into the active env
 	pip install -r requirements.txt
@@ -24,6 +24,12 @@ demo:             ## Phase 3: scripted 3-turn conversation on Groq
 
 chat:             ## Phase 3: interactive chat on Groq (ACCOUNT=ACC-0001 by default)
 	python scripts/chat_cli.py --backend groq --account $${ACCOUNT:-ACC-0001}
+
+tune-guardrails:  ## Phase 4: pick the injection threshold on the dev set, write it to the config
+	python scripts/tune_guardrails.py --apply
+
+demo-guardrails:  ## Phase 4: one probe per guardrail on Groq
+	python scripts/chat_cli.py --backend groq --demo-guardrails
 
 serve:            ## Phase 3: FastAPI on http://localhost:8080 (docs at /docs)
 	uvicorn bankguard.api:app --port 8080

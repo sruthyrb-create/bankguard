@@ -2,7 +2,7 @@
 
 A guarded, tool-using customer-support agent for **Northwind Bank** (fictional), with an evaluation harness, a red-team suite, LoRA fine-tuning and inference benchmarks. All data is synthetic.
 
-**Status:** Phase 3a (agent loop + API on Groq). Results tables are added in Phase 9 and every number comes from `results/*.json`.
+**Status:** Phase 4 (input/output guardrails, switchable in `configs/guardrails.yaml`). Results tables are added in Phase 9 and every number comes from `results/*.json`.
 
 ## Setup (WSL2 / Linux)
 
@@ -16,6 +16,7 @@ make data
 make setup-ml
 make index
 make sanity
+make tune-guardrails   # downloads the injection classifier, sets its threshold
 make test
 ```
 

@@ -1,11 +1,18 @@
 # Each guardrail can be switched off to measure its effect (Phase 4+).
+# Order at run time: pii_masking -> injection_classifier -> topic_filter -> model,
+# then schema_check / action_policy before each tool call, and
+# grounding_check / day_count_check / pii_leak_check on the final answer.
 input:
   pii_masking: true
   injection_classifier: true
-  injection_threshold: null   # chosen on a dev set in Phase 4, logged in DECISIONS.md
+  injection_model: protectai/deberta-v3-base-prompt-injection-v2
+  injection_revision: main
+  injection_threshold: 0.9999993443489075   # set by `make tune-guardrails` from the dev set; logged in DECISIONS.md
   topic_filter: true
 output:
   schema_check: true
   grounding_check: true
+  day_count_check: true       # "N business/calendar days" must match policy text / tool output seen this session
   pii_leak_check: true
   action_policy: true
+  max_repairs: 1              # times the model may rewrite an answer that fails a check, then fallback

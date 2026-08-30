@@ -9,3 +9,5 @@ tokenizers==0.23.3
 safetensors==0.8.0
 faiss-cpu==1.16.0
 scikit-learn==1.9.1
+# Phase 4: DeBERTa-v3 tokenizer for the prompt-injection classifier.
+sentencepiece==0.2.3
