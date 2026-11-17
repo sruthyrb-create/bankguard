@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from bankguard.guardrails.pii import mask_pii
+from bankguard.guardrails.pii import mask_pii, normalize_dashes
 
 # ---------------------------------------------------------------- schema check
 
@@ -151,8 +151,8 @@ class LeakResult:
 
 
 def redact_leaks(answer: str, own_account: str) -> LeakResult:
-    """Mask PII and any account id that is not the session's own account."""
-    masked = mask_pii(answer)
+    """Mask PII and any account id that is not the session's own account (dash variants normalised first)."""
+    masked = mask_pii(answer)  # mask_pii normalises dashes
     found = dict(masked.found)
     n_other = 0
 
@@ -199,11 +199,11 @@ def check_action(tool: str, args: dict[str, Any], messages: list[dict[str, Any]]
     """
     if tool not in GUARDED_TOOLS:
         return ActionDecision(True, "not a guarded tool")
-    txn = str(args.get("transaction_id", "")).upper()
+    txn = normalize_dashes(str(args.get("transaction_id", ""))).upper()
     user_idx = max((i for i, m in enumerate(messages) if m.get("role") == "user"), default=None)
     if user_idx is None:
         return ActionDecision(False, "no user message")
-    user_text = str(messages[user_idx].get("content") or "")
+    user_text = normalize_dashes(str(messages[user_idx].get("content") or ""))
     if _NEGATE.search(user_text):
         return ActionDecision(False, "the latest user message declines or postpones")
     if not _AFFIRM.search(user_text):
@@ -212,7 +212,8 @@ def check_action(tool: str, args: dict[str, Any], messages: list[dict[str, Any]]
         return ActionDecision(True, "user confirmed and named the transaction")
     prev_assistant = next((m for m in reversed(messages[:user_idx])
                            if m.get("role") == "assistant" and m.get("content")), None)
-    named = {t.upper() for t in _TXN.findall(str(prev_assistant["content"]))} if prev_assistant else set()
+    named = ({t.upper() for t in _TXN.findall(normalize_dashes(str(prev_assistant["content"])))}
+             if prev_assistant else set())
     if named == {txn}:
         return ActionDecision(True, "user confirmed the transaction the assistant named")
     if txn in named:

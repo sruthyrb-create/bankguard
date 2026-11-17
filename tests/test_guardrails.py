@@ -331,3 +331,23 @@ def test_results_json_is_valid_if_present() -> None:
     if path.exists():
         data = json.loads(path.read_text(encoding="utf-8"))
         assert data["n"] == len(load_dev())
+
+
+# ------------------------------------------------- non-breaking hyphens (U+2011)
+
+NBH = "‑"
+
+
+def test_action_policy_reads_ids_with_non_breaking_hyphens() -> None:
+    """Regression from run 0 (eval-dispute-04): the agent wrote TXN‑040737 with U+2011 and a confirmed
+    dispute was blocked."""
+    msgs = _msgs(("assistant", f"I see Harbor Grill in Lagos (TXN{NBH}000123). Flag it or open a dispute?"),
+                 ("user", "Yes, please open a dispute for it."))
+    assert check_action("open_dispute", DISPUTE, msgs).allowed
+
+
+def test_leak_check_and_topic_filter_read_non_breaking_hyphens() -> None:
+    r = redact_leaks(f"That belongs to ACC{NBH}0002.", ACC)
+    assert r.found == {"OTHER_ACCOUNT": 1} and "0002" not in r.text
+    assert check_topic(f"Show ACC{NBH}0002 please", ACC).category == "other_customer"
+    assert mask_pii(f"call 555{NBH}201{NBH}3344").found == {"PHONE": 1}

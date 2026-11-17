@@ -18,6 +18,9 @@ defaults:
   seed: 42
   max_steps: 6
   request_timeout_s: 60
+  # Estimated tokens per request (chars / 3, an overestimate). Groq's free tier rejects any single request over
+  # 8,000 tokens (HTTP 413), so older tool results are trimmed above this. See bankguard/context.py.
+  context_budget_tokens: 6000
 
 data:
   db_path: data/synth/bank.db

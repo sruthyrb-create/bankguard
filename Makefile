@@ -1,4 +1,4 @@
-.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails
+.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails eval-scenarios eval-pilot eval-on eval-off judge eval-report labels agreement
 
 setup:            ## install pinned core dependencies into the active env
 	pip install -r requirements.txt
@@ -36,3 +36,33 @@ serve:            ## Phase 3: FastAPI on http://localhost:8080 (docs at /docs)
 
 test:             ## run unit tests
 	pytest -q
+
+# ---- Phase 5: eval harness (stays inside Groq's free tier; every run is resumable)
+eval-scenarios:   ## rebuild data/scenarios/eval/eval_v1.jsonl from bank.db
+	python scripts/build_eval_scenarios.py
+
+eval-pilot:       ## 10 pilot scenarios with guardrails on (measures real tokens per scenario)
+	python scripts/run_eval.py --guardrails on --pilot
+
+eval-on:          ## all 60 scenarios, guardrails on (skips finished ones)
+	python scripts/run_eval.py --guardrails on
+
+eval-off:         ## all 60 scenarios, every guardrail off
+	python scripts/run_eval.py --guardrails off
+
+RUN_ON  ?= gpt-oss-120b_on_v1
+RUN_OFF ?= gpt-oss-120b_off_v1
+
+judge:            ## LLM-judge both runs (skips judged ones); override with RUN_ON=... RUN_OFF=...
+	python scripts/judge_eval.py --run $(RUN_ON)
+	-python scripts/judge_eval.py --run $(RUN_OFF)
+
+eval-report:      ## aggregate all runs into results/eval_report.json
+	python scripts/report_eval.py
+
+labels:           ## export the blind hand-labelling sheet (data/labels/judge_labels.csv)
+	python scripts/export_labels.py --runs $(RUN_ON) $(RUN_OFF)
+
+agreement:        ## your labels vs the judge -> results/judge_agreement.json
+	python scripts/judge_agreement.py
+

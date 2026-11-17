@@ -23,6 +23,14 @@ _EMAIL = re.compile(r"(?i)\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b")
 
 PII_TYPES = ("CARD", "SSN", "PHONE", "EMAIL")
 
+# gpt-oss often writes ids with a non-breaking hyphen (U+2011): "TXN‑040737". Every check that matches ids,
+# phone numbers or dates runs on text with all dash variants turned into "-", or it silently misses them.
+_DASHES = re.compile(r"[\u2010-\u2015\u2212\ufe58\ufe63\uff0d]")
+
+
+def normalize_dashes(text: str) -> str:
+    return _DASHES.sub("-", text)
+
 
 @dataclass
 class PIIResult:
@@ -39,6 +47,7 @@ class PIIResult:
 def mask_pii(text: str) -> PIIResult:
     """Replace PII with [CARD], [SSN], [PHONE], [EMAIL] placeholders."""
     found: dict[str, int] = {}
+    text = normalize_dashes(text)
 
     def sub(pattern: re.Pattern[str], label: str, s: str, group: int = 0) -> str:
         def repl(m: re.Match[str]) -> str:

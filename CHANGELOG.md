@@ -56,3 +56,22 @@
 ## Phase 4 fix 3 (2026-11-13)
 - `day_count_check` reads numbers written as words ("three business days" = "3 business days"); regression test from the Groq demo.
 
+## Phase 5, part 1: eval harness (2026-11-16)
+- `bankguard/eval/`: scenario format and loader, rule graders, free-tier pacing (`PacedLLM`, per-day usage ledger), scenario runner (each scenario on a temporary bank.db copy; resumable records), LLM judge prompt and parser, metrics.
+- `data/scenarios/eval/eval_v1.jsonl`: 60 scenarios built from bank.db by `scripts/build_eval_scenarios.py` (10 lookup, 8 flag, 12 dispute, 15 policy, 8 refusal, 7 error handling).
+- Scripts: `run_eval.py` (guardrails on/off, `--pilot`), `judge_eval.py`, `report_eval.py`, `export_labels.py` (blind hand-labelling sheet), `judge_agreement.py` (Cohen's kappa). `configs/eval.yaml`. Make targets `eval-pilot`, `eval-on`, `eval-off`, `judge`, `eval-report`, `labels`, `agreement`.
+- `LLMClient`: records Groq's provider-cached prompt tokens, `is_cached()` for local cache hits, optional extra request fields. `TurnResult.llm_stats` sums cached tokens, API calls, retries, server time and LLM time per turn.
+- System prompt: cite chunk ids retrieved "in this conversation" (matches the session-scoped grounding check).
+
+## Phase 5, part 1 fix (2026-11-16)
+- Day-count guardrail: sources exclude the model's own text (search query, echoed arguments); regression test from pilot scenario eval-policy-11.
+- Guardrail repair/fallback events store the rejected answer. Report splits false refusals by kind and says whether an output fallback prevented a wrong answer.
+- `scripts/show_eval.py`: print transcripts of failed (or chosen) scenarios, no API calls.
+
+## Phase 5, part 2: agent v1 fits the free tier (2026-11-17)
+- `bankguard/context.py`: compact encoding of tool results; `fit_context` keeps each request under `context_budget_tokens` (configs/models.yaml, 6000 estimated tokens) by stubbing older tool results, then cutting rows. `context_trim` trace events; `llm_call` events record the estimate next to the real prompt tokens.
+- Dash normalisation (`normalize_dashes`) in PII masking, topic filter, action policy, leak redaction and the eval grader; regression tests from run 0.
+- Pacer waits for room for the request's estimated size.
+- Run names include `agent_version` (configs/eval.yaml, `v1`). Make targets use `RUN_ON` / `RUN_OFF`.
+- Tests: `tests/test_context.py`, hyphen and pacer regressions.
+

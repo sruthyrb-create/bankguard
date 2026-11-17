@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identified that a dispute was already open for the transaction and declined to open a duplicate, consistent with the reference and database state.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 702,
+ "tokens_out": 47
+}

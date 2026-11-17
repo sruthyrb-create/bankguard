@@ -175,3 +175,25 @@ def test_citation_from_an_earlier_turn_is_grounded(db: Path, tmp_path: Path) -> 
     r = agent.run_turn(session, "remind me how long?")
     assert r.answer == "As I said, 45 days 【1005.11(c)#1】."
     assert [e for e in r.guardrail_events if e["action"] != "pass"] == []
+
+
+class EchoPolicyIndex(FakePolicyIndex):
+    def search(self, query: str, k: int = 4) -> list[dict]:
+        return [{"chunk_id": "1005.11(c)#2", "section": "1005.11", "heading": "h", "score": 0.5,
+                 "text": "the institution may take up to 45 days from receipt of a notice of error"}]
+
+
+def test_search_query_does_not_count_as_a_source(db: Path, tmp_path: Path) -> None:
+    """Regression from the Phase 5 pilot (eval-policy-11): the model searched for "45 business days" and the
+    echoed query made its own wrong claim look supported."""
+    llm = FakeLLM([
+        LLMResponse("", [call("search_policy", {"query": "Regulation E investigation 45 business days"})]),
+        LLMResponse("Yes, 45 business days 【1005.11(c)#2】."),
+        LLMResponse("No: 45 days (calendar) 【1005.11(c)#2】."),
+    ])
+    agent = Agent(llm, str(db), Tracer("t", tmp_path / "t.jsonl"), policy_index=EchoPolicyIndex(),
+                  guardrails=Guardrails(ALL_ON, scorer=KeywordScorer()))
+    r = agent.run_turn(Session(account_id=ACC), "Is it 45 business days?")
+    assert r.answer == "No: 45 days (calendar) 【1005.11(c)#2】."
+    repair = [e for e in r.guardrail_events if e["action"] == "repair"]
+    assert repair and repair[0]["rejected"] == "Yes, 45 business days 【1005.11(c)#2】."

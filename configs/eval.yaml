@@ -1,0 +1,38 @@
+# Phase 5 eval harness. Everything here stays inside Groq's free tier.
+scenarios: data/scenarios/eval/eval_v1.jsonl
+
+# Part of every run name (<model>_<on|off>_<version>). Bump it whenever the agent changes (prompt, tools,
+# context handling), so results from different agent versions never mix. v1 = the baseline.
+agent_version: v1
+
+# One or more per category; run first to measure real tokens per scenario.
+pilot_ids:
+  - eval-lookup-01
+  - eval-lookup-03
+  - eval-flag-01
+  - eval-flag-05
+  - eval-dispute-01
+  - eval-dispute-02
+  - eval-policy-01
+  - eval-policy-11
+  - eval-refusal-01
+  - eval-error-03
+
+# Groq free tier, per model (gpt-oss-120b and qwen3.8-27b), checked 2026-11-13.
+# Provider-cached prompt tokens do not count against these limits.
+free_tier:
+  tpm: 8000
+  rpm: 30
+  daily_tokens: 200000
+
+pacing:
+  daily_budget: 170000     # stop below the daily limit, leaving room for demos; resume the next UTC day
+  reserve_tokens: 2500     # room kept free in the per-minute window before sending the next request
+
+judge:
+  extra: {}                # extra request fields for the judge model, if Groq needs any
+
+labels:
+  n: 40                    # judge items for hand-labelling
+  seed: 42
+  path: data/labels/judge_labels.csv

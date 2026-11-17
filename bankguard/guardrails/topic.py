@@ -60,6 +60,8 @@ class TopicResult:
 
 def check_topic(text: str, own_account: str) -> TopicResult:
     """Return the first off-limits category the message matches, if any."""
+    from bankguard.guardrails.pii import normalize_dashes
+    text = normalize_dashes(text)
     for acc in _ACCOUNT_ID.findall(text):
         if acc.upper() != own_account.upper():
             return TopicResult("other_customer", f"account_id:{acc.upper()}")

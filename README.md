@@ -2,7 +2,7 @@
 
 A guarded, tool-using customer-support agent for **Northwind Bank** (fictional), with an evaluation harness, a red-team suite, LoRA fine-tuning and inference benchmarks. All data is synthetic.
 
-**Status:** Phase 4 (input/output guardrails, switchable in `configs/guardrails.yaml`). Results tables are added in Phase 9 and every number comes from `results/*.json`.
+**Status:** Phase 5 in progress (eval harness: 60 scenarios, rule graders, LLM judge, judge agreement). Results tables are added in Phase 9 and every number comes from `results/*.json`.
 
 ## Setup (WSL2 / Linux)
 

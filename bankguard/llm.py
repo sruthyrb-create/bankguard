@@ -62,14 +62,17 @@ class LLMResponse:
     cached: bool = False
     server_ms: int | None = None  # provider-reported processing time (Groq usage.total_time), if any
     retries: int | None = None    # SDK retries before success (429/5xx/timeouts), if the SDK reports it
+    cached_tokens: int = 0        # prompt tokens served from the provider's prompt cache (not rate-limited on Groq)
 
 
 class LLMClient:
     """OpenAI-compatible chat client with retries (SDK backoff) and an optional disk cache."""
 
     def __init__(self, base_url: str, api_key: str, model: str, temperature: float = 0.0,
-                 seed: int | None = 42, timeout_s: float = 60, use_cache: bool = True) -> None:
+                 seed: int | None = 42, timeout_s: float = 60, use_cache: bool = True,
+                 extra: dict[str, Any] | None = None) -> None:
         self.model, self.temperature, self.seed = model, temperature, seed
+        self.extra = dict(extra or {})  # extra request fields, e.g. provider-specific reasoning settings
         self.use_cache = use_cache and temperature == 0
         self._client = OpenAI(base_url=base_url, api_key=api_key, timeout=timeout_s, max_retries=4)
 
@@ -77,14 +80,21 @@ class LLMClient:
         key = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
         return CACHE_DIR / f"{key}.json"
 
-    def chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None) -> LLMResponse:
-        """Send one chat-completions request and normalise the reply."""
+    def _payload(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None) -> dict[str, Any]:
         payload: dict[str, Any] = {"model": self.model, "messages": messages, "temperature": self.temperature}
         if tools:
             payload |= {"tools": tools, "tool_choice": "auto"}
         if self.seed is not None:
             payload["seed"] = self.seed
+        return payload | self.extra
 
+    def is_cached(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None) -> bool:
+        """True if this exact request would be answered from the local disk cache (no API call)."""
+        return self.use_cache and self._cache_path(self._payload(messages, tools)).exists()
+
+    def chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None) -> LLMResponse:
+        """Send one chat-completions request and normalise the reply."""
+        payload = self._payload(messages, tools)
         path = self._cache_path(payload)
         t0 = time.perf_counter()
         if self.use_cache and path.exists():
@@ -92,7 +102,7 @@ class LLMClient:
             data["tool_calls"] = [ToolCall(**tc) for tc in data["tool_calls"]]
             # Report the time actually spent now, not the latency recorded when the response was cached.
             data |= {"cached": True, "latency_ms": int((time.perf_counter() - t0) * 1000),
-                     "server_ms": None, "retries": 0}
+                     "server_ms": None, "retries": 0, "cached_tokens": 0}
             return LLMResponse(**data)
 
         try:
@@ -116,6 +126,7 @@ class LLMClient:
             finish_reason=choice.finish_reason or "",
             server_ms=_server_ms(resp.usage),
             retries=getattr(raw, "retries_taken", None),
+            cached_tokens=_cached_tokens(resp.usage),
         )
         if self.use_cache:
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -123,6 +134,15 @@ class LLMClient:
             data.pop("cached")
             path.write_text(json.dumps(data), encoding="utf-8")
         return out
+
+
+def _cached_tokens(usage: Any) -> int:
+    """OpenAI-style usage.prompt_tokens_details.cached_tokens (Groq fills it for gpt-oss models)."""
+    details = getattr(usage, "prompt_tokens_details", None)
+    if details is None:
+        details = (getattr(usage, "model_extra", None) or {}).get("prompt_tokens_details")
+    value = details.get("cached_tokens") if isinstance(details, dict) else getattr(details, "cached_tokens", None)
+    return int(value or 0)
 
 
 def _server_ms(usage: Any) -> int | None:
@@ -133,7 +153,8 @@ def _server_ms(usage: Any) -> int | None:
     return int(float(total) * 1000) if isinstance(total, (int, float)) else None
 
 
-def make_llm(backend: str, model: str | None = None, use_cache: bool = True) -> LLMClient:
+def make_llm(backend: str, model: str | None = None, use_cache: bool = True,
+             extra: dict[str, Any] | None = None) -> LLMClient:
     """Build a client for 'groq' or 'local' from configs/models.yaml."""
     load_env()
     cfg = load_yaml("models")
@@ -144,11 +165,11 @@ def make_llm(backend: str, model: str | None = None, use_cache: bool = True) -> 
         if not key:
             raise RuntimeError(f"{g['api_key_env']} is not set; add it to .env")
         return LLMClient(g["base_url"], key, model or g["agent_model"], d["temperature"], d["seed"],
-                         d["request_timeout_s"], use_cache)
+                         d["request_timeout_s"], use_cache, extra)
     if backend == "local":
         loc = cfg["local"]
         base = os.getenv(loc["base_url_env"], "http://localhost:8000/v1")
         key = get_secret(loc["api_key_env"]) or "not-needed"
         return LLMClient(base, key, model or loc["agent_model"], d["temperature"], d["seed"],
-                         d["request_timeout_s"], use_cache)
+                         d["request_timeout_s"], use_cache, extra)
     raise ValueError(f"Unknown backend {backend!r}; use 'groq' or 'local'.")

@@ -1,0 +1,135 @@
+{
+ "scenario_id": "eval-dispute-07",
+ "category": "dispute",
+ "account": "ACC-0294",
+ "run": "gpt-oss-120b_on",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-16T17:14:11+00:00",
+ "turns": [
+  {
+   "user": "Please open a dispute for TXN-040760, it's a duplicate charge.",
+   "answer": "Your dispute for **TXN‑040760** (duplicate charge of $30.27) has been opened.\n\n**Dispute ID:** DSP‑5D651A3B  \n**Current status:** open  \n\n**Timeline**\n\n| Milestone | Date |\n|-----------|------|\n| Provisional credit (if applicable) | **by 2026‑11‑16** |\n| Investigation completed | **by 2027‑01‑31** |\n| Investigation limit | **90 calendar days** (point‑of‑sale debit‑card transaction) |\n\nWe’ll investigate the charge and keep you updated. If you have any additional information or questions, just let me know.",
+   "tool_calls": [
+    {
+     "tool": "open_dispute",
+     "args": {
+      "account_id": "ACC-0294",
+      "reason": "Duplicate charge",
+      "transaction_id": "TXN-040760"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 1799,
+   "tokens_out": 335,
+   "latency_ms": 58650,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 822,
+    "llm_ms": 1518
+   }
+  },
+  {
+   "user": "Can you open another dispute for TXN-040760 just to be safe?",
+   "answer": "I’m sorry, but a dispute for **TXN‑040760** is already open (Dispute ID DSP‑5D651A3B). We can’t open a second dispute for the same transaction. If you’d like, I can provide the current status or any updates we receive. Let me know how you’d like to proceed.",
+   "tool_calls": [],
+   "llm_calls": 1,
+   "tokens_in": 1175,
+   "tokens_out": 128,
+   "latency_ms": 601,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0012,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 1,
+    "retries": 0,
+    "server_ms": 355,
+    "llm_ms": 507
+   }
+  }
+ ],
+ "disputes": [
+  "TXN-040760"
+ ],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected ['TXN-040760'], got ['TXN-040760']"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

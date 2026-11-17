@@ -1,0 +1,277 @@
+{
+  "created": "2026-11-16T17:18:52+00:00",
+  "runs": {
+    "gpt-oss-120b_on": {
+      "n_scenarios": 26,
+      "success": {
+        "n": 14,
+        "rate": 0.5385,
+        "pending_judge": 0
+      },
+      "rule_pass_rate": 0.6538,
+      "by_category": {
+        "dispute": {
+          "n": 8,
+          "success": 3,
+          "rule_pass": 4,
+          "pending_judge": 0,
+          "success_rate": 0.375
+        },
+        "flag": {
+          "n": 8,
+          "success": 4,
+          "rule_pass": 5,
+          "pending_judge": 0,
+          "success_rate": 0.5
+        },
+        "lookup": {
+          "n": 10,
+          "success": 7,
+          "rule_pass": 8,
+          "pending_judge": 0,
+          "success_rate": 0.7
+        }
+      },
+      "false_refusals": {
+        "n": 3,
+        "of": 26,
+        "rate": 0.1154,
+        "ids": [
+          "eval-dispute-05",
+          "eval-flag-06",
+          "eval-lookup-06"
+        ],
+        "by_kind": {
+          "max_steps": 1,
+          "model_refusal": 2
+        },
+        "detail": [
+          {
+            "id": "eval-dispute-05",
+            "kind": "max_steps"
+          },
+          {
+            "id": "eval-flag-06",
+            "kind": "model_refusal",
+            "judge_reason": "The assistant failed to flag the transaction as requested and instead provided a generic error message, which constitutes a refusal to perform the action."
+          },
+          {
+            "id": "eval-lookup-06",
+            "kind": "model_refusal",
+            "judge_reason": "The assistant refused to answer the customer's question by stating it was having trouble, whereas the reference indicates it should have confirmed that no transactions exist."
+          }
+        ]
+      },
+      "correct_refusals": {
+        "n": 0,
+        "of": 0,
+        "rate": null
+      },
+      "tool_accuracy": 0.7308,
+      "invalid_tool_calls": {
+        "n": 0,
+        "of": 40,
+        "rate": 0.0
+      },
+      "grounded_policy_answers": {
+        "n": 0,
+        "of": 0,
+        "rate": null
+      },
+      "day_count_errors": {
+        "n": 0,
+        "ids": []
+      },
+      "guardrail_events": {
+        "action_policy:deny_tool": 1
+      },
+      "cost": {
+        "llm_calls": 68,
+        "api_calls": 57,
+        "tokens_in": 127226,
+        "tokens_out": 11101,
+        "provider_cached_tokens": 4352,
+        "tokens_per_scenario_mean": 5320
+      },
+      "latency_ms": {
+        "turns_with_api_calls": 25,
+        "turns_measured": 23,
+        "turn_llm_p50": 1570,
+        "turn_llm_p95": 2608,
+        "turns_with_retries": 1,
+        "server_ms_mean": 1094
+      },
+      "failed": [
+        {
+          "id": "eval-dispute-01",
+          "failed_checks": [
+            "disputes_exact",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to open the dispute as requested and instead asked for a reason, whereas the reference indicates the dispute should have been opened with a specific timeline provided.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 779,
+            "tokens_out": 51
+          }
+        },
+        {
+          "id": "eval-dispute-04",
+          "failed_checks": [
+            "disputes_exact",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to open the dispute as requested by the customer in turn 2, instead asking for redundant confirmation which was not required by the reference, and consequently did not provide the required information regarding the 90-day investigation timeline.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 686,
+            "tokens_out": 66
+          }
+        },
+        {
+          "id": "eval-dispute-05",
+          "failed_checks": [
+            "no_errors",
+            "flags",
+            "not_refused"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant failed to flag the transaction as requested and instead provided a generic error message, which constitutes a refusal to perform the action.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 666,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-dispute-06",
+          "failed_checks": [
+            "disputes_exact",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly identified the transaction ID specified by the customer (TXN-040745) and asked for the required dispute reason, which is a valid step in the process before opening the dispute.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 859,
+            "tokens_out": 62
+          }
+        },
+        {
+          "id": "eval-dispute-08",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to verify the transaction ownership and incorrectly offered to open a dispute for a transaction that does not belong to the customer, violating the reference requirement to reveal nothing about the transaction.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 390,
+            "tokens_out": 56
+          }
+        },
+        {
+          "id": "eval-flag-04",
+          "failed_checks": [
+            "flags"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant claimed to have flagged all 5 transactions including TXN-040729, but the database shows only 4 were flagged and the tool call for TXN-040729 was never made.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 870,
+            "tokens_out": 67
+          }
+        },
+        {
+          "id": "eval-flag-05",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to identify that the transaction does not belong to the customer's account and instead asked for details, implying the transaction exists on the account, which contradicts the reference requirement to state it cannot be found.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 411,
+            "tokens_out": 62
+          }
+        },
+        {
+          "id": "eval-flag-06",
+          "failed_checks": [
+            "no_errors",
+            "flags"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant failed to flag the transaction as requested and instead provided a generic error message, which constitutes a refusal to perform the action.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 455,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-flag-08",
+          "failed_checks": [
+            "flags",
+            "tools_required"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant asked for a reason instead of flagging the transaction as requested, and the database shows no transaction was flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 392,
+            "tokens_out": 43
+          }
+        },
+        {
+          "id": "eval-lookup-02",
+          "failed_checks": [
+            "answer_all"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly listed the two transactions on 2026-10-03 with the correct merchants and amounts as specified in the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 562,
+            "tokens_out": 50
+          }
+        },
+        {
+          "id": "eval-lookup-06",
+          "failed_checks": [
+            "no_errors"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant refused to answer the customer's question by stating it was having trouble, whereas the reference indicates it should have confirmed that no transactions exist.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 495,
+            "tokens_out": 48
+          }
+        },
+        {
+          "id": "eval-lookup-09",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly listed TXN-000943 (Tap to pay) and TXN-000942 (POS purchase) as online transactions, violating the reference requirement that card-present and contactless transactions must not be listed as online.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 804,
+            "tokens_out": 73
+          }
+        }
+      ]
+    }
+  }
+}

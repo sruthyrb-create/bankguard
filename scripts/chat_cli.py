@@ -95,7 +95,8 @@ def main() -> None:
     policy_index = _default_policy_index()  # load embeddings once, before timing any turn
     guardrails = Guardrails(GuardrailConfig.all_off()) if args.no_guardrails else Guardrails.from_config()
     print(f"Guardrails on: {', '.join(guardrails.config.enabled()) or 'none'}")
-    agent = Agent(llm, db, tracer, cfg["defaults"]["max_steps"], policy_index=policy_index, guardrails=guardrails)
+    agent = Agent(llm, db, tracer, cfg["defaults"]["max_steps"], policy_index=policy_index, guardrails=guardrails,
+                  context_budget=cfg["defaults"].get("context_budget_tokens"))
 
     if args.demo_guardrails:
         account, turns = guardrail_turns(db)
