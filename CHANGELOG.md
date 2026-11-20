@@ -75,3 +75,9 @@
 - Run names include `agent_version` (configs/eval.yaml, `v1`). Make targets use `RUN_ON` / `RUN_OFF`.
 - Tests: `tests/test_context.py`, hyphen and pacer regressions.
 
+## Phase 5, part 3: held-out set and regrading (2026-11-19)
+- `data/scenarios/heldout/heldout_v1.jsonl`: 20 held-out scenarios (builder: `scripts/build_eval_scenarios.py`). `run_eval.py --set heldout` (`make eval-heldout`); run names get a `_heldout` suffix.
+- Eval grader accepts sub-paragraph citations of retrieved paragraphs; `scripts/regrade_eval.py` (`make regrade RUN=...`) re-applies graders to saved records without API calls.
+- `check_grounding(..., allow_subparagraphs)`; guardrail setting `grounding_allow_subparagraphs` (default false, unchanged for v1).
+- Judge and labelling sheet read references from every scenario set.
+

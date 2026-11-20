@@ -1,0 +1,107 @@
+{
+ "scenario_id": "eval-policy-11",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:16:28+00:00",
+ "turns": [
+  {
+   "user": "Is it 45 business days that the bank has to investigate?",
+   "answer": "Yes. Under Regulation E, a financial institution must complete its investigation of an error within **10 business days** of receiving the consumer’s notice. If it cannot finish the investigation in that time, it may take up to **45 business days** to investigate and determine whether an error occurred, provided it provisionally credits the consumer’s account within the first 10 business days and follows the other required notice steps【1005.11(c)#1】.  \n\n(There are further extensions in certain situations, but the standard maximum investigation period after the initial 10‑day window is 45 business days.)",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E investigation 45 business days"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2642,
+   "tokens_out": 288,
+   "latency_ms": 10,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 0,
+    "retries": 0,
+    "server_ms": 0,
+    "llm_ms": 0,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.1(a)#1",
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.15(e)#4"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": false,
+   "detail": "45 business days"
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": false,
+   "detail": "none of [['45 days', '45 calendar days', 'calendar']]"
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#1'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}

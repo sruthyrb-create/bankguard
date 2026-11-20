@@ -1,0 +1,107 @@
+{
+ "scenario_id": "eval-policy-10",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:16:28+00:00",
+ "turns": [
+  {
+   "user": "Can the bank make me confirm my error report in writing?",
+   "answer": "Yes. Under Regulation E, a financial institution **may** require you to give written confirmation of an error after you have reported it orally. The bank must tell you that written confirmation is required and provide the address where you should send it, and the written confirmation must be supplied within 10 business days of your oral notice【1005.11(b)#2】.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "error report written confirmation requirement Regulation E"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2699,
+   "tokens_out": 253,
+   "latency_ms": 12,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 0,
+    "retries": 0,
+    "server_ms": 0,
+    "llm_ms": 0,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.1(a)#1",
+  "1005.11(b)#1",
+  "1005.15(e)#2",
+  "1005.18(d)#2",
+  "1005.8(b)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": false,
+   "detail": "cited ['1005.11(b)#2'], unsupported ['1005.11(b)#2'], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}

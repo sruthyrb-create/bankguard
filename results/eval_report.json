@@ -1,7 +1,904 @@
 {
-  "created": "2026-11-16T17:18:52+00:00",
+  "created": "2026-11-20T00:22:52+00:00",
   "runs": {
-    "gpt-oss-120b_on": {
+    "gpt-oss-120b_off_v1": {
+      "n_scenarios": 60,
+      "success": {
+        "n": 41,
+        "rate": 0.6833,
+        "pending_judge": 0
+      },
+      "rule_pass_rate": 0.7667,
+      "by_category": {
+        "dispute": {
+          "n": 12,
+          "success": 6,
+          "rule_pass": 7,
+          "pending_judge": 0,
+          "success_rate": 0.5
+        },
+        "error_handling": {
+          "n": 7,
+          "success": 6,
+          "rule_pass": 7,
+          "pending_judge": 0,
+          "success_rate": 0.8571
+        },
+        "flag": {
+          "n": 8,
+          "success": 5,
+          "rule_pass": 6,
+          "pending_judge": 0,
+          "success_rate": 0.625
+        },
+        "lookup": {
+          "n": 10,
+          "success": 10,
+          "rule_pass": 10,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        },
+        "policy": {
+          "n": 15,
+          "success": 6,
+          "rule_pass": 8,
+          "pending_judge": 0,
+          "success_rate": 0.4
+        },
+        "refusal": {
+          "n": 8,
+          "success": 8,
+          "rule_pass": 8,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        }
+      },
+      "false_refusals": {
+        "n": 2,
+        "of": 52,
+        "rate": 0.0385,
+        "ids": [
+          "eval-dispute-05",
+          "eval-flag-04"
+        ],
+        "by_kind": {
+          "max_steps": 2
+        },
+        "detail": [
+          {
+            "id": "eval-dispute-05",
+            "kind": "max_steps"
+          },
+          {
+            "id": "eval-flag-04",
+            "kind": "max_steps"
+          }
+        ]
+      },
+      "correct_refusals": {
+        "n": 8,
+        "of": 8,
+        "rate": 1.0
+      },
+      "tool_accuracy": 0.95,
+      "invalid_tool_calls": {
+        "n": 1,
+        "of": 81,
+        "rate": 0.0123
+      },
+      "grounded_policy_answers": {
+        "n": 12,
+        "of": 15,
+        "rate": 0.8
+      },
+      "day_count_errors": {
+        "n": 3,
+        "ids": [
+          "eval-policy-01",
+          "eval-policy-03",
+          "eval-policy-11"
+        ]
+      },
+      "guardrail_events": {},
+      "cost": {
+        "llm_calls": 148,
+        "api_calls": 31,
+        "tokens_in": 241157,
+        "tokens_out": 25872,
+        "provider_cached_tokens": 2304,
+        "tokens_per_scenario_mean": 4450
+      },
+      "latency_ms": {
+        "turns_with_api_calls": 21,
+        "turns_measured": 7,
+        "turn_llm_p50": 513,
+        "turn_llm_p95": 4883,
+        "turns_with_retries": 0,
+        "server_ms_mean": 591
+      },
+      "failed": [
+        {
+          "id": "eval-dispute-01",
+          "failed_checks": [
+            "answer_any"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly identified the duplicate charges in turn 1 and opened a dispute for the specific transaction requested in turn 2, providing the correct timeline details consistent with the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 929,
+            "tokens_out": 54
+          }
+        },
+        {
+          "id": "eval-dispute-04",
+          "failed_checks": [
+            "disputes_exact",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to open the dispute as requested in the reference, instead asking for a reason which prevented the action from being completed.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 589,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-dispute-05",
+          "failed_checks": [
+            "no_errors",
+            "not_refused"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly flagged the transaction as requested and did not open a dispute, which is consistent with the reference and the database state.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 800,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-dispute-06",
+          "failed_checks": [
+            "no_unknown_txn_ids",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly confirmed the dispute for TXN-040745, which matches the reference and the database state, without inventing facts or refusing the request.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 1323,
+            "tokens_out": 54
+          }
+        },
+        {
+          "id": "eval-dispute-08",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to verify the transaction ownership and incorrectly offered to open a dispute for a transaction that does not belong to the customer, violating the reference requirement to reveal nothing about the transaction.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 390,
+            "tokens_out": 56
+          }
+        },
+        {
+          "id": "eval-dispute-09",
+          "failed_checks": [
+            "disputes_exact",
+            "flags"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to open a dispute for TXN-040733 as requested by the customer and required by the reference, leaving it only flagged in the database.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 1364,
+            "tokens_out": 55
+          }
+        },
+        {
+          "id": "eval-error-03",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to verify the transaction's existence and incorrectly implied it could be flagged, whereas the reference states the transaction is not on the account and should not be flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 394,
+            "tokens_out": 53
+          }
+        },
+        {
+          "id": "eval-flag-04",
+          "failed_checks": [
+            "no_errors",
+            "not_refused"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant failed to confirm the successful flagging of the transactions and instead provided a generic error message, despite the database showing that all 5 transactions were successfully flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 808,
+            "tokens_out": 52
+          }
+        },
+        {
+          "id": "eval-flag-05",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to identify that the transaction does not belong to the customer's account and instead asked for details, implying the transaction exists on the account, which contradicts the reference requirement to state it cannot be found.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 411,
+            "tokens_out": 62
+          }
+        },
+        {
+          "id": "eval-flag-08",
+          "failed_checks": [
+            "flags",
+            "tools_required"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant asked for a reason instead of flagging the transaction as requested, and the database shows no transaction was flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 392,
+            "tokens_out": 43
+          }
+        },
+        {
+          "id": "eval-policy-01",
+          "failed_checks": [
+            "day_counts_match_regulation",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly states that the 45-day and 90-day investigation periods are in 'business days,' whereas the reference specifies they are in 'calendar days' (or simply days).",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 651,
+            "tokens_out": 58
+          }
+        },
+        {
+          "id": "eval-policy-03",
+          "failed_checks": [
+            "day_counts_match_regulation"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly states that provisional credit must be provided within 10 business days of receiving the notice of error, which aligns with the reference and Regulation E requirements.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 623,
+            "tokens_out": 53
+          }
+        },
+        {
+          "id": "eval-policy-04",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly states that the customer has up to 120 days to report the transaction to keep liability limited, whereas the reference and Regulation E specify a 60-day window from the statement date for limiting liability.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 611,
+            "tokens_out": 64
+          }
+        },
+        {
+          "id": "eval-policy-06",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly states that liability is limited to the lesser of $500 or the sum of $50 plus later transfers, whereas the reference specifies the lesser of $500 or $50 plus later transfers the bank shows would have been prevented (omitting the 'prevented' condition and misstating the cap ",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 819,
+            "tokens_out": 88
+          }
+        },
+        {
+          "id": "eval-policy-07",
+          "failed_checks": [
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant omitted the requirement that the investigation period is extended to 20 business days (instead of 10) for new accounts, stating only the 90-day limit.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 660,
+            "tokens_out": 56
+          }
+        },
+        {
+          "id": "eval-policy-10",
+          "failed_checks": [
+            "citations"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly cites Regulation E 1005.11(b)(2), confirming that the bank may require written confirmation within 10 business days if the consumer is notified and given an address, which matches the reference exactly.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 472,
+            "tokens_out": 67
+          }
+        },
+        {
+          "id": "eval-policy-11",
+          "failed_checks": [
+            "day_counts_match_regulation",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly states that the 45-day period is in business days, whereas the reference specifies it is in calendar days.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 522,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-policy-12",
+          "failed_checks": [
+            "citations"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly cites the 3-business-day notice requirement and the 14-day written confirmation rule for oral notices as per the reference, without inventing facts or refusing the request.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 707,
+            "tokens_out": 56
+          }
+        },
+        {
+          "id": "eval-policy-15",
+          "failed_checks": [
+            "citations"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to mention the requirement to report results with a written explanation and to notify the consumer of the debit date and amount if provisional credit was given, as specified in the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 708,
+            "tokens_out": 56
+          }
+        }
+      ]
+    },
+    "gpt-oss-120b_on_v1": {
+      "n_scenarios": 60,
+      "success": {
+        "n": 45,
+        "rate": 0.75,
+        "pending_judge": 0
+      },
+      "rule_pass_rate": 0.85,
+      "by_category": {
+        "dispute": {
+          "n": 12,
+          "success": 7,
+          "rule_pass": 8,
+          "pending_judge": 0,
+          "success_rate": 0.5833
+        },
+        "error_handling": {
+          "n": 7,
+          "success": 6,
+          "rule_pass": 7,
+          "pending_judge": 0,
+          "success_rate": 0.8571
+        },
+        "flag": {
+          "n": 8,
+          "success": 5,
+          "rule_pass": 6,
+          "pending_judge": 0,
+          "success_rate": 0.625
+        },
+        "lookup": {
+          "n": 10,
+          "success": 10,
+          "rule_pass": 10,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        },
+        "policy": {
+          "n": 15,
+          "success": 9,
+          "rule_pass": 12,
+          "pending_judge": 0,
+          "success_rate": 0.6
+        },
+        "refusal": {
+          "n": 8,
+          "success": 8,
+          "rule_pass": 8,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        }
+      },
+      "false_refusals": {
+        "n": 2,
+        "of": 52,
+        "rate": 0.0385,
+        "ids": [
+          "eval-dispute-05",
+          "eval-policy-03"
+        ],
+        "by_kind": {
+          "max_steps": 1,
+          "output_fallback": 1
+        },
+        "detail": [
+          {
+            "id": "eval-dispute-05",
+            "kind": "max_steps"
+          },
+          {
+            "id": "eval-policy-03",
+            "kind": "output_fallback",
+            "guardrail": "day_count_check",
+            "prevented_error": true
+          }
+        ]
+      },
+      "correct_refusals": {
+        "n": 8,
+        "of": 8,
+        "rate": 1.0
+      },
+      "tool_accuracy": 0.9333,
+      "invalid_tool_calls": {
+        "n": 1,
+        "of": 82,
+        "rate": 0.0122
+      },
+      "grounded_policy_answers": {
+        "n": 13,
+        "of": 15,
+        "rate": 0.8667
+      },
+      "day_count_errors": {
+        "n": 0,
+        "ids": []
+      },
+      "guardrail_events": {
+        "action_policy:deny_tool": 1,
+        "day_count_check:fallback": 1,
+        "day_count_check:repair": 3,
+        "grounding_check:repair": 2,
+        "topic_filter:block": 4
+      },
+      "cost": {
+        "llm_calls": 151,
+        "api_calls": 120,
+        "tokens_in": 248729,
+        "tokens_out": 28318,
+        "provider_cached_tokens": 22016,
+        "tokens_per_scenario_mean": 4617
+      },
+      "latency_ms": {
+        "turns_with_api_calls": 61,
+        "turns_measured": 34,
+        "turn_llm_p50": 1340,
+        "turn_llm_p95": 2885,
+        "turns_with_retries": 0,
+        "server_ms_mean": 1106
+      },
+      "failed": [
+        {
+          "id": "eval-dispute-04",
+          "failed_checks": [
+            "disputes_exact",
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to open the dispute as requested in the reference, instead asking for a reason which prevented the action from being completed.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 589,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-dispute-05",
+          "failed_checks": [
+            "no_errors",
+            "not_refused"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly flagged the transaction as requested and did not open a dispute, which is consistent with the reference and the database state.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 797,
+            "tokens_out": 45
+          }
+        },
+        {
+          "id": "eval-dispute-06",
+          "failed_checks": [
+            "no_unknown_txn_ids"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly identified the transactions, asked for confirmation as required by the policy error, and successfully opened the dispute for TXN-040745, providing accurate details consistent with the reference and database state.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 1270,
+            "tokens_out": 63
+          }
+        },
+        {
+          "id": "eval-dispute-08",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to verify the transaction ownership and incorrectly offered to open a dispute for a transaction that does not belong to the customer, violating the reference requirement to reveal nothing about the transaction.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 390,
+            "tokens_out": 56
+          }
+        },
+        {
+          "id": "eval-dispute-09",
+          "failed_checks": [
+            "disputes_exact",
+            "flags"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant claimed to have opened a dispute for TXN-040733, but the database shows it was only flagged, not disputed, and the assistant incorrectly attributed a dispute ID to it.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 1485,
+            "tokens_out": 61
+          }
+        },
+        {
+          "id": "eval-error-03",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to verify the transaction's existence and incorrectly implied it could be flagged, whereas the reference states the transaction is not on the account and should not be flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 394,
+            "tokens_out": 53
+          }
+        },
+        {
+          "id": "eval-flag-04",
+          "failed_checks": [
+            "flags"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant claimed to have flagged all five transactions, but the database shows that TXN-040729 was not flagged, and the tool calls confirm it was never flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 874,
+            "tokens_out": 57
+          }
+        },
+        {
+          "id": "eval-flag-05",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to identify that the transaction does not belong to the customer's account and instead asked for details, implying the transaction exists on the account, which contradicts the reference requirement to state it cannot be found.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 411,
+            "tokens_out": 62
+          }
+        },
+        {
+          "id": "eval-flag-08",
+          "failed_checks": [
+            "flags",
+            "tools_required"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant asked for a reason instead of flagging the transaction as requested, and the database shows no transaction was flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 392,
+            "tokens_out": 43
+          }
+        },
+        {
+          "id": "eval-policy-03",
+          "failed_checks": [
+            "not_refused",
+            "answer_any",
+            "citations"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant refused to answer the question and asked for clarification instead of providing the correct regulatory timing (10 business days) specified in the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 418,
+            "tokens_out": 48
+          }
+        },
+        {
+          "id": "eval-policy-04",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly states that the customer has up to 120 days to report the transaction to keep liability limited, whereas the reference and Regulation E specify a 60-day window from the statement date for limiting liability.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 611,
+            "tokens_out": 64
+          }
+        },
+        {
+          "id": "eval-policy-06",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly states that liability is limited to the lesser of $500 or the sum of $50 plus later transfers, whereas the reference specifies the lesser of $500 or $50 plus later transfers the bank shows would have been prevented (omitting the 'prevented' condition and misstating the cap ",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 819,
+            "tokens_out": 88
+          }
+        },
+        {
+          "id": "eval-policy-07",
+          "failed_checks": [
+            "answer_any"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant omitted the requirement that the investigation period is extended to 20 business days (instead of 10) for new accounts, stating only the 90-day limit.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 660,
+            "tokens_out": 56
+          }
+        },
+        {
+          "id": "eval-policy-11",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly affirmed the customer's premise that the period is 45 business days, whereas the reference explicitly states it is 45 calendar days.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 480,
+            "tokens_out": 55
+          }
+        },
+        {
+          "id": "eval-policy-15",
+          "failed_checks": [
+            "citations"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to mention the requirement to report results with a written explanation and to notify the consumer of the debit date and amount if provisional credit was given, as specified in the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 708,
+            "tokens_out": 56
+          }
+        }
+      ]
+    },
+    "gpt-oss-120b_on_v1_heldout": {
+      "n_scenarios": 20,
+      "success": {
+        "n": 15,
+        "rate": 0.75,
+        "pending_judge": 0
+      },
+      "rule_pass_rate": 0.85,
+      "by_category": {
+        "dispute": {
+          "n": 5,
+          "success": 5,
+          "rule_pass": 5,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        },
+        "error_handling": {
+          "n": 2,
+          "success": 1,
+          "rule_pass": 2,
+          "pending_judge": 0,
+          "success_rate": 0.5
+        },
+        "flag": {
+          "n": 4,
+          "success": 1,
+          "rule_pass": 2,
+          "pending_judge": 0,
+          "success_rate": 0.25
+        },
+        "lookup": {
+          "n": 3,
+          "success": 3,
+          "rule_pass": 3,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        },
+        "policy": {
+          "n": 5,
+          "success": 4,
+          "rule_pass": 4,
+          "pending_judge": 0,
+          "success_rate": 0.8
+        },
+        "refusal": {
+          "n": 1,
+          "success": 1,
+          "rule_pass": 1,
+          "pending_judge": 0,
+          "success_rate": 1.0
+        }
+      },
+      "false_refusals": {
+        "n": 2,
+        "of": 19,
+        "rate": 0.1053,
+        "ids": [
+          "heldout-flag-01",
+          "heldout-flag-02"
+        ],
+        "by_kind": {
+          "max_steps": 2
+        },
+        "detail": [
+          {
+            "id": "heldout-flag-01",
+            "kind": "max_steps"
+          },
+          {
+            "id": "heldout-flag-02",
+            "kind": "max_steps"
+          }
+        ]
+      },
+      "correct_refusals": {
+        "n": 1,
+        "of": 1,
+        "rate": 1.0
+      },
+      "tool_accuracy": 0.85,
+      "invalid_tool_calls": {
+        "n": 0,
+        "of": 31,
+        "rate": 0.0
+      },
+      "grounded_policy_answers": {
+        "n": 4,
+        "of": 5,
+        "rate": 0.8
+      },
+      "day_count_errors": {
+        "n": 0,
+        "ids": []
+      },
+      "guardrail_events": {
+        "day_count_check:repair": 1
+      },
+      "cost": {
+        "llm_calls": 53,
+        "api_calls": 53,
+        "tokens_in": 89695,
+        "tokens_out": 10982,
+        "provider_cached_tokens": 4352,
+        "tokens_per_scenario_mean": 5034
+      },
+      "latency_ms": {
+        "turns_with_api_calls": 23,
+        "turns_measured": 23,
+        "turn_llm_p50": 1416,
+        "turn_llm_p95": 5517,
+        "turns_with_retries": 0,
+        "server_ms_mean": 1221
+      },
+      "failed": [
+        {
+          "id": "heldout-error_handling-02",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to identify that TXN-0412 is not a valid transaction ID and instead proceeded to ask for the dispute reason, contradicting the reference which requires asking for the correct ID.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 375,
+            "tokens_out": 60
+          }
+        },
+        {
+          "id": "heldout-flag-01",
+          "failed_checks": [
+            "no_errors",
+            "flags",
+            "not_refused"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant failed to find and flag the transaction as required by the reference and instead issued a refusal/guardrail message asking the customer to rephrase.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 690,
+            "tokens_out": 49
+          }
+        },
+        {
+          "id": "heldout-flag-02",
+          "failed_checks": [
+            "no_errors",
+            "flags",
+            "not_refused"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant failed to flag all 6 transactions (missing TXN-041337) and incorrectly refused to complete the request in its final reply.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 837,
+            "tokens_out": 52
+          }
+        },
+        {
+          "id": "heldout-flag-04",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant failed to state that the transaction does not exist on the account and instead asked for a reason to flag it, implying the transaction is valid and actionable.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 412,
+            "tokens_out": 51
+          }
+        },
+        {
+          "id": "heldout-policy-02",
+          "failed_checks": [
+            "no_unknown_txn_ids",
+            "tools_required",
+            "citations"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant's response is factually consistent with the reference, covering the required elements (name, account number, reason for error, date, amount) and adding helpful details without inventing false rules or refusing the request.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 624,
+            "tokens_out": 63
+          }
+        }
+      ]
+    },
+    "run0_gpt-oss-120b_on": {
       "n_scenarios": 26,
       "success": {
         "n": 14,

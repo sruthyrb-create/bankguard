@@ -1,0 +1,139 @@
+{
+ "scenario_id": "eval-dispute-11",
+ "category": "dispute",
+ "account": "ACC-0322",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:16:28+00:00",
+ "turns": [
+  {
+   "user": "I was double charged by Shopwise Online on October 29.",
+   "answer": "I see two identical $136.03 charges from **Shopwise Online** on October 29:\n\n| Transaction ID | Date & Time (local) | Amount |\n|----------------|---------------------|--------|\n| **TXN-040746** | 2026‑10‑29 10:34 | $136.03 |\n| **TXN-034988** | 2026‑10‑29 10:04 | $136.03 |\n\nBoth appear to be “Recurring payment” entries, which suggests they were processed twice.\n\nWould you like me to:\n\n1. **Flag these charges as unusual** (so they’re noted for review), and/or  \n2. **Open a dispute** for one or both of the transactions?\n\nPlease let me know which action(s) you’d like to take.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0322",
+      "end_date": "2026-10-31",
+      "limit": 20,
+      "start_date": "2026-10-20"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2398,
+   "tokens_out": 393,
+   "latency_ms": 4,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 0,
+    "retries": 0,
+    "server_ms": 0,
+    "llm_ms": 0,
+    "context_trims": 0
+   }
+  },
+  {
+   "user": "Yes, dispute TXN-040746.",
+   "answer": "Your dispute for **TXN‑040746** (Shopwise Online, $136.03 on 2026‑10‑29) has been opened.\n\n**Dispute details**\n- **Dispute ID:** DSP‑2B4D351D  \n- **Amount:** $136.03  \n- **Status:** open  \n\n**What happens next (Regulation E error‑resolution rules)**  \n- The bank must **provisionally credit** the disputed amount to your account by **2026‑11‑16** (within 10 business days of receiving the notice).  \n- The investigation must be **completed by 2027‑01‑31** (up to 90 calendar days for point‑of‑sale debit‑card transactions)【1005.11(c)#3】.  \n- If the bank finds an error, the provisional credit becomes final; if not, you’ll receive a written explanation of the findings【1005.11(d)#1】.  \n\nYou’ll be notified when the provisional credit is posted and when the investigation is finished. If you have any other questions or need further assistance, just let me know.",
+   "tool_calls": [
+    {
+     "tool": "open_dispute",
+     "args": {
+      "account_id": "ACC-0322",
+      "reason": "Double charged on October 29; duplicate $136.03 charge from Shopwise Online",
+      "transaction_id": "TXN-040746"
+     },
+     "error": null
+    },
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E error resolution provisional credit 10 business days 45 calendar days 90 calendar days"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 7045,
+   "tokens_out": 478,
+   "latency_ms": 60902,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1072,
+    "llm_ms": 1670,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [
+  "TXN-040746"
+ ],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(b)#2",
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.11(d)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected ['TXN-040746'], got ['TXN-040746']"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

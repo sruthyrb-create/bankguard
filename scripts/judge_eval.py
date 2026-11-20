@@ -16,7 +16,7 @@ from bankguard.config import REPO_ROOT, load_yaml  # noqa: E402
 from bankguard.eval.judge import judge_messages, parse_verdict  # noqa: E402
 from bankguard.eval.pacing import BudgetExhausted, PacedLLM, UsageLedger  # noqa: E402
 from bankguard.eval.runner import load_records  # noqa: E402
-from bankguard.eval.scenarios import load_scenarios  # noqa: E402
+from bankguard.eval.scenarios import all_references  # noqa: E402
 from bankguard.llm import make_llm  # noqa: E402
 
 JUDGE_DIR = REPO_ROOT / "results" / "eval" / "judge"
@@ -37,7 +37,7 @@ def main() -> None:
     args = p.parse_args()
 
     cfg, models = load_yaml("eval"), load_yaml("models")
-    refs = {s.id: s.reference for s in load_scenarios(REPO_ROOT / cfg["scenarios"])}
+    refs = all_references()
     records = load_records(args.run)
     if not records:
         sys.exit(f"No records in results/eval/runs/{args.run}/")

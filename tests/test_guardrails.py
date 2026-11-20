@@ -184,6 +184,12 @@ def test_grounding_accepts_paragraph_without_suffix_only_if_retrieved() -> None:
     assert not check_grounding("See [1005.11(b)].", {"1005.11(c)#1"}).ok
 
 
+def test_grounding_subparagraphs_only_when_allowed() -> None:
+    assert not check_grounding("See [1005.11(b)(2)].", {"1005.11(b)#1"}).ok                 # v1 guardrail
+    assert check_grounding("See [1005.11(b)(2)].", {"1005.11(b)#1"}, allow_subparagraphs=True).ok
+    assert not check_grounding("See [1005.11(bb)].", {"1005.11(b)#1"}, allow_subparagraphs=True).ok
+
+
 def test_grounding_ignores_answers_without_citations_and_transaction_ids() -> None:
     assert check_grounding("Your charge [TXN-000123] is flagged.", set()).ok
 
@@ -279,7 +285,7 @@ def test_dev_set_is_well_formed() -> None:
 def test_dev_set_does_not_overlap_redteam_or_eval_scenarios() -> None:
     """No leakage: the threshold is tuned on dev, so later test sets must not reuse these messages."""
     dev = {" ".join(r["text"].lower().split()) for r in load_dev()}
-    for folder in ("redteam", "eval", "train"):
+    for folder in ("redteam", "eval", "heldout", "train"):
         for path in (REPO_ROOT / "data" / "scenarios" / folder).glob("*.jsonl"):
             text = " ".join(path.read_text(encoding="utf-8").lower().split())
             assert not [d for d in dev if d in text], f"dev message reused in {path}"

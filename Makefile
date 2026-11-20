@@ -1,4 +1,4 @@
-.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails eval-scenarios eval-pilot eval-on eval-off judge eval-report labels agreement
+.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails eval-scenarios eval-pilot eval-on eval-off eval-heldout regrade judge eval-report labels agreement
 
 setup:            ## install pinned core dependencies into the active env
 	pip install -r requirements.txt
@@ -52,6 +52,12 @@ eval-off:         ## all 60 scenarios, every guardrail off
 
 RUN_ON  ?= gpt-oss-120b_on_v1
 RUN_OFF ?= gpt-oss-120b_off_v1
+
+eval-heldout:     ## the 20 held-out scenarios, guardrails on
+	python scripts/run_eval.py --guardrails on --set heldout
+
+regrade:          ## re-apply current rule graders to saved runs (no API calls); RUN=<name>
+	python scripts/regrade_eval.py --run $(RUN) --write
 
 judge:            ## LLM-judge both runs (skips judged ones); override with RUN_ON=... RUN_OFF=...
 	python scripts/judge_eval.py --run $(RUN_ON)

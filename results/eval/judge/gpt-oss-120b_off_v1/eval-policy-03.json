@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly states that provisional credit must be provided within 10 business days of receiving the notice of error, which aligns with the reference and Regulation E requirements.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 623,
+ "tokens_out": 53
+}

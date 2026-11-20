@@ -27,6 +27,8 @@ from typing import Any
 from bankguard.config import REPO_ROOT
 
 EVAL_DIR = REPO_ROOT / "data" / "scenarios" / "eval"
+HELDOUT_DIR = REPO_ROOT / "data" / "scenarios" / "heldout"
+SETS = {"main": EVAL_DIR, "heldout": HELDOUT_DIR}
 CATEGORIES = ("lookup", "flag", "dispute", "policy", "refusal", "error_handling")
 CHECK_KEYS = {"tools_required", "answer_all", "answer_any", "answer_none", "citations", "disputes",
               "flags_required", "flags_allowed", "clarify"}
@@ -61,9 +63,10 @@ class Scenario:
             raise ValueError(f"{self.id}: expect_refusal must be true exactly for refusal scenarios")
 
 
-def load_scenarios(path: Path | None = None) -> list[Scenario]:
-    """Load every *.jsonl under data/scenarios/eval (or one file)."""
-    paths = [path] if path else sorted(EVAL_DIR.glob("*.jsonl"))
+def load_scenarios(path: Path | None = None, scenario_set: str = "main") -> list[Scenario]:
+    """Load every *.jsonl of a scenario set (main = data/scenarios/eval, heldout = data/scenarios/heldout),
+    or one file."""
+    paths = [path] if path else sorted(SETS[scenario_set].glob("*.jsonl"))
     out: list[Scenario] = []
     for p in paths:
         with Path(p).open(encoding="utf-8") as f:
@@ -72,3 +75,8 @@ def load_scenarios(path: Path | None = None) -> list[Scenario]:
     if len(ids) != len(set(ids)):
         raise ValueError("duplicate scenario ids")
     return out
+
+
+def all_references() -> dict[str, str]:
+    """scenario id -> reference, across every set (the judge and the labelling sheet need both)."""
+    return {s.id: s.reference for name in SETS for s in load_scenarios(scenario_set=name)}

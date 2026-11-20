@@ -1,0 +1,94 @@
+{
+ "scenario_id": "eval-flag-01",
+ "category": "flag",
+ "account": "ACC-0089",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:05:15+00:00",
+ "turns": [
+  {
+   "user": "Please flag TXN-040738, I don't recognise it.",
+   "answer": "The charge TXN-040738 has been flagged as unusual per your request. If you’d like to discuss this transaction further or open a dispute, just let me know.",
+   "tool_calls": [
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0089",
+      "reason": "Customer does not recognize the transaction",
+      "transaction_id": "TXN-040738"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 1654,
+   "tokens_out": 160,
+   "latency_ms": 710,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 1,
+    "retries": 0,
+    "server_ms": 184,
+    "llm_ms": 701,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [
+  "TXN-040738"
+ ],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required ['TXN-040738'], allowed ['TXN-040738'], got ['TXN-040738']"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

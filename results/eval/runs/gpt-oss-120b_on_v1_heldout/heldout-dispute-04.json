@@ -1,0 +1,187 @@
+{
+ "scenario_id": "heldout-dispute-04",
+ "category": "dispute",
+ "account": "ACC-0035",
+ "run": "gpt-oss-120b_on_v1_heldout",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-20T00:17:36+00:00",
+ "turns": [
+  {
+   "user": "I don't recognise a $3,425.70 Shopwise Online charge.",
+   "answer": "I see a single recent charge that matches the amount you mentioned:\n\n- **Transaction ID:** TXN‑041960  \n- **Date/Time:** 2026‑10‑13 11:19 (online)  \n- **Merchant:** Shopwise Online  \n- **Category:** Shopping  \n- **Amount:** $3,425.70  \n\nIf this charge is not yours, we can **flag it as an unusual charge** and, if you wish, start a formal dispute.\n\n### What Regulation E says about unauthorized electronic fund transfers  \n- An “unauthorized electronic fund transfer” is one initiated by someone other than you without your authority [1005.2(m)#1].  \n- You must notify the bank **within 90 days** after the date the unauthorized transfer is reflected on a periodic statement (the standard 60‑day window is extended to 90 days for service‑provider accounts) [1005.14(b)#2].  \n- Once you report the error, the bank has **45 days** to investigate, or **90 days** if the transfer involved a point‑of‑sale debit‑card transaction or other special circumstances [1005.11(c)#3].\n\n### Next steps  \n1. **Flag the charge** as unusual so we can begin our internal review.  \n2. If you confirm the charge is not yours, we can **open a dispute** on your behalf.\n\nWould you like me to flag this transaction now? And would you like to proceed with a dispute after we flag it?",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0035",
+      "limit": 20
+     },
+     "error": null
+    },
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0035",
+      "limit": 20,
+      "min_amount": 3000
+     },
+     "error": null
+    },
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E dispute unauthorized electronic fund transfer timeline"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 4,
+   "tokens_in": 7030,
+   "tokens_out": 710,
+   "latency_ms": 118480,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 4,
+    "retries": 0,
+    "server_ms": 1845,
+    "llm_ms": 3264,
+    "context_trims": 0
+   }
+  },
+  {
+   "user": "Yes, open a dispute for it.",
+   "answer": "**Dispute opened**  \n- **Dispute ID:** DSP‑9ED1FB73  \n- **Transaction:** TXN‑041960 – $3,425.70 to Shopwise Online (2026‑10‑13)  \n- **Reason:** Unauthorized charge – you do not recognize the transaction.  \n\n**Regulation E timeline for this type of dispute**\n\n| Step | Deadline | How the deadline is measured | Regulation E citation |\n|------|----------|------------------------------|-----------------------|\n| **Provisional credit** (temporary credit while we investigate) | **2026‑11‑16** (10 **business** days after the dispute was opened) | Business days (weekdays, excluding holidays) | [1005.11(c)#2] |\n| **Investigation completion** (final decision) | **2026‑12‑17** (45 **calendar** days after the dispute was opened) | Calendar days (all days, including weekends) | [1005.11(c)#3] |\n| **Possible extension** | Up to **90 calendar days** if the transfer was (A) not initiated within a U.S. state, (B) a point‑of‑sale debit‑card transaction, or (C) occurred within 30 days of the account’s first deposit. | Calendar days | [1005.11(c)#3] |\n\n**What you can expect**\n\n1. **Provisional credit** will be posted to your account by **2026‑11‑16**. You will have full use of those funds while we investigate.  \n2. We will complete our investigation and provide a final result by **2026‑12‑17** (or up to 90 calendar days if one of the extension conditions applies).  \n\nIf you have any supporting documents (receipts, emails, etc.) that could help our review, please forward them. We’ll keep you updated as the investigation progresses.",
+   "tool_calls": [
+    {
+     "tool": "open_dispute",
+     "args": {
+      "account_id": "ACC-0035",
+      "reason": "Unauthorized charge – customer does not recognize transaction",
+      "transaction_id": "TXN-041960"
+     },
+     "error": null
+    },
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E provisional credit within 10 days"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 4,
+   "tokens_in": 13600,
+   "tokens_out": 1397,
+   "latency_ms": 186155,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "repair",
+     "detail": "unsupported day counts: ['10 calendar days']",
+     "rejected": "Your dispute has been opened.\n\n- **Dispute ID:** DSP‑9ED1FB73  \n- **Transaction:** TXN‑041960 – $3,425.70 to Shopwise Online (2026‑10‑13)  \n- **Reason:** Unauthorized charge – you do not recognize the transaction.  \n\n**What happens next**\n\n| Milestone | Target date |\n|-----------|-------------|\n| Provisional credit (temporary credit while we investigate) | **2026‑11‑16** |\n| Investigation completed (final decision) | **2026‑12‑17** |\n\nUnder Regulation E, we must provide a provisional credit within **10 calendar days** of opening the dispute and complete the investigation within **45 calendar days** (or up to 90 days for certain special cases) [1005.11(c)#3].\n\nIf you have any additional information (e.g., receipts, communications) that could help our review, please let us know. Otherwise, w"
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 1536,
+    "api_calls": 4,
+    "retries": 0,
+    "server_ms": 4224,
+    "llm_ms": 6142,
+    "context_trims": 1
+   }
+  }
+ ],
+ "disputes": [
+  "TXN-041960"
+ ],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.11(d)#1",
+  "1005.11(d)#2",
+  "1005.14(b)#2",
+  "1005.15(e)#3",
+  "1005.15(e)#4",
+  "1005.19(b)#4",
+  "1005.2(m)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected ['TXN-041960'], got ['TXN-041960']"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

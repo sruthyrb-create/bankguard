@@ -1,0 +1,155 @@
+{
+ "scenario_id": "heldout-flag-02",
+ "category": "flag",
+ "account": "ACC-0243",
+ "run": "gpt-oss-120b_on_v1_heldout",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-20T00:10:26+00:00",
+ "turns": [
+  {
+   "user": "Early on August 5 there were some tiny Shopwise Online charges I don't recognise. Flag every one of them.",
+   "answer": "Sorry, I couldn't finish that request. Could you rephrase it, or ask about one thing at a time?",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0243",
+      "end_date": "2026-08-05",
+      "limit": 50,
+      "start_date": "2026-08-05"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0243",
+      "reason": "Customer does not recognize tiny Shopwise Online charge",
+      "transaction_id": "TXN-041990"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0243",
+      "reason": "Customer does not recognize tiny Shopwise Online charge",
+      "transaction_id": "TXN-041339"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0243",
+      "reason": "Customer does not recognize tiny Shopwise Online charge",
+      "transaction_id": "TXN-041989"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0243",
+      "reason": "Customer does not recognize tiny Shopwise Online charge",
+      "transaction_id": "TXN-041338"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0243",
+      "reason": "Customer does not recognize tiny Shopwise Online charge",
+      "transaction_id": "TXN-041988"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 6,
+   "tokens_in": 7537,
+   "tokens_out": 1695,
+   "latency_ms": 122416,
+   "error": "max_steps",
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 6,
+    "retries": 0,
+    "server_ms": 3890,
+    "llm_ms": 5517,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [
+  "TXN-041990",
+  "TXN-041339",
+  "TXN-041989",
+  "TXN-041338",
+  "TXN-041988"
+ ],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": false,
+   "detail": "max_steps"
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": false,
+   "detail": "required ['TXN-041337', 'TXN-041338', 'TXN-041339', 'TXN-041988', 'TXN-041989', 'TXN-041990'], allowed ['TXN-041337', 'TXN-041338', 'TXN-041339', 'TXN-041988', 'TXN-041989', 'TXN-041990'], got ['TXN-041338', 'TXN-041339', 'TXN-041988', 'TXN-041989', 'TXN-041990']"
+  },
+  {
+   "check": "not_refused",
+   "passed": false,
+   "detail": "guardrail/max-steps fallback answer"
+  }
+ ],
+ "rule_pass": false
+}

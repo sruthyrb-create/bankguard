@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identified 5 transactions at Bluebird Coffee in September 2026, matching the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 445,
+ "tokens_out": 42
+}

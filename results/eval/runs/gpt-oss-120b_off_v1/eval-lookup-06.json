@@ -1,0 +1,102 @@
+{
+ "scenario_id": "eval-lookup-06",
+ "category": "lookup",
+ "account": "ACC-0006",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:05:15+00:00",
+ "turns": [
+  {
+   "user": "Did I have any charges from Corner Fuel?",
+   "answer": "I’ve reviewed all of the recent transactions on your ACC‑0006 account (from 2026‑08‑01 through today, 2026‑11‑02) and there are no charges from a merchant named **Corner Fuel** in that period.  \n\nIf you’d like me to look farther back in time or check a specific date range, just let me know!",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0006",
+      "end_date": "2026-11-02",
+      "limit": 50,
+      "start_date": "2026-08-01"
+     },
+     "error": null
+    },
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0006",
+      "end_date": "2026-11-02",
+      "limit": 50
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 8444,
+   "tokens_out": 450,
+   "latency_ms": 5,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 0,
+    "retries": 0,
+    "server_ms": 0,
+    "llm_ms": 0,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

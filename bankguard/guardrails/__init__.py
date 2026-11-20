@@ -44,6 +44,7 @@ class GuardrailConfig:
     topic_filter: bool = False
     schema_check: bool = False
     grounding_check: bool = False
+    grounding_allow_subparagraphs: bool = False
     day_count_check: bool = False
     pii_leak_check: bool = False
     action_policy: bool = False

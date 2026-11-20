@@ -1,0 +1,118 @@
+{
+ "scenario_id": "eval-lookup-06",
+ "category": "lookup",
+ "account": "ACC-0006",
+ "run": "gpt-oss-120b_on_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-17T18:08:39+00:00",
+ "turns": [
+  {
+   "user": "Did I have any charges from Corner Fuel?",
+   "answer": "I’ve reviewed all of the recent transactions on your ACC‑0006 account (from 2026‑08‑01 through today, 2026‑11‑02) and there are no charges from a merchant named **Corner Fuel** in that period.  \n\nIf you’d like me to look farther back in time or check a specific date range, just let me know!",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0006",
+      "end_date": "2026-11-02",
+      "limit": 50,
+      "start_date": "2026-08-01"
+     },
+     "error": null
+    },
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0006",
+      "end_date": "2026-11-02",
+      "limit": 50
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 8444,
+   "tokens_out": 450,
+   "latency_ms": 62807,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1075,
+    "llm_ms": 1599,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

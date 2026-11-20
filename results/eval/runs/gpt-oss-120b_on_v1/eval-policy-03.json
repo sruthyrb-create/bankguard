@@ -1,0 +1,135 @@
+{
+ "scenario_id": "eval-policy-03",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-17T18:35:12+00:00",
+ "turns": [
+  {
+   "user": "If the bank needs more time to investigate, when do I get provisional credit?",
+   "answer": "I couldn't back up that policy answer with the Regulation E text I retrieved, so I won't guess. Could you ask the question again, or ask about one rule at a time?",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E provisional credit timing investigation more time"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 5039,
+   "tokens_out": 658,
+   "latency_ms": 60885,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0001,
+     "threshold": 0.9999993443489075
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "repair",
+     "detail": "unsupported day counts: ['45 business days']",
+     "rejected": "Under Regulation E, when you notify the bank of a possible error the institution must:\n\n1. **Provide a provisional credit** within **10 business days** of receiving your notice of error, even if it expects the investigation to take longer. The credit is for the full amount you claim is in error (including any interest, if applicable). [1005.11(c)#1]\n\n2. If the bank cannot finish its investigation within those first 10 business days, it may extend the overall investigation period to **up to 45 business days** from the date it received your notice. During that extended period you keep full use of the provisional credit. [1005.11(c)#2]\n\nSo, if the bank needs more time, you should see the provisional credit posted **no later than the 10th business day after they received your error notice**. T"
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "fallback",
+     "detail": "unsupported day counts: ['45 business days']",
+     "rejected": "Under Regulation E, the bank must **provisionally credit your account within 10 business days** of receiving your notice of error, even if it expects the investigation to take longer. You keep full use of that credit while the bank continues its review. If the investigation can’t be finished in those first 10 business days, the bank may extend the overall investigation period to **up to 45 business days** from the date it received your notice, but the provisional credit still must be posted by the 10‑day deadline. [1005.11(c)#1] [1005.11(c)#2]"
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 768,
+    "api_calls": 3,
+    "retries": 0,
+    "server_ms": 2012,
+    "llm_ms": 2885,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.11(d)#1",
+  "1005.7(a)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": false,
+   "detail": "guardrail/max-steps fallback answer"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": false,
+   "detail": "none of [['10 business days', 'ten business days']]"
+  },
+  {
+   "check": "citations",
+   "passed": false,
+   "detail": "cited [], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}

@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly cites the 3-business-day notice requirement and the 14-day written confirmation rule for oral notices as per the reference, without inventing facts or refusing the request.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 707,
+ "tokens_out": 56
+}

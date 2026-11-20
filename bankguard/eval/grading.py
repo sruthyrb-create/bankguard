@@ -117,7 +117,8 @@ def grade(sc: Scenario, run: dict[str, Any]) -> list[dict[str, Any]]:
         present = [s for s in c["answer_none"] if normalise(s) in normalise(all_answers)]
         out.append(_check("answer_none", not present, f"present {present}" if present else ""))
     if "citations" in c:
-        g = check_grounding(answer, set(run["retrieved_ids"]))
+        # The grader accepts precise sub-paragraph citations of retrieved paragraphs (see DECISIONS, 2026-11-19).
+        g = check_grounding(answer, set(run["retrieved_ids"]), allow_subparagraphs=True)
         prefixes = c["citations"].get("prefixes", [])
         has_prefix = any(x.startswith(p) for x in g.cited for p in prefixes) if prefixes else True
         ok = bool(g.cited) and g.ok and has_prefix

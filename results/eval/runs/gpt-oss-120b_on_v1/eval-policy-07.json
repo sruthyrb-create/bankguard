@@ -1,0 +1,123 @@
+{
+ "scenario_id": "eval-policy-07",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-19T04:46:43+00:00",
+ "turns": [
+  {
+   "user": "My account was opened two weeks ago. Does the bank get extra time to investigate an error?",
+   "answer": "Under Regulation E, a bank must investigate an error promptly:\n\n* **Standard timeline** – The institution has 10 business days to investigate and must report the result within 3 business days of completing the investigation. If it cannot finish within 10 business days, it may take up to 45 days, provided it makes a provisional credit within the first 10 business days [1005.11(c)#1‑2].\n\n* **Extra time for new accounts** – When the error involves an electronic fund transfer that occurs **within 30 days after the first deposit to the account**, the investigation window is extended to **90 days** instead of the usual 45 days [1005.11(c)#3].\n\nSo, because your account was opened only two weeks ago (14 days), any error on an electronic transfer that happened during that period gives the bank up to 90 calendar days to complete its investigation, as long as it provides the required provisional credit within the first 10 business days.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E error investigation time bank extra time investigate error"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2621,
+   "tokens_out": 452,
+   "latency_ms": 1614,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1079,
+    "llm_ms": 1430,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(b)#2",
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.15(e)#4"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": false,
+   "detail": "none of [['20 business days', 'twenty business days']]"
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#3'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}

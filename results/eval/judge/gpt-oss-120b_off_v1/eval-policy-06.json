@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant incorrectly states that liability is limited to the lesser of $500 or the sum of $50 plus later transfers, whereas the reference specifies the lesser of $500 or $50 plus later transfers the bank shows would have been prevented (omitting the 'prevented' condition and misstating the cap ",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 819,
+ "tokens_out": 88
+}

@@ -1,0 +1,162 @@
+{
+ "scenario_id": "heldout-dispute-01",
+ "category": "dispute",
+ "account": "ACC-0158",
+ "run": "gpt-oss-120b_on_v1_heldout",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-20T00:11:30+00:00",
+ "turns": [
+  {
+   "user": "PageTurn Books charged me twice on October 3.",
+   "answer": "I see two identical charges from **PageTurn Books** on **October 3, 2026**:\n\n| Transaction ID | Date & Time (local) | Amount |\n|----------------|---------------------|--------|\n| **TXN-017089** | 2026‑10‑03 11:25 (contactless) | **$23.51** |\n| **TXN-041977** | 2026‑10‑03 11:53 (contactless) | **$23.51** |\n\nBoth are for the same merchant, same amount, and occurred only 28 minutes apart, which looks like a duplicate charge.\n\nWould you like me to:\n\n1. **Flag one or both of these transactions as unusual**, so we can investigate further, **or**  \n2. **Open a dispute** for the duplicate charge(s)?\n\nPlease let me know which action you’d prefer (and, if opening a dispute, which transaction you’d like to dispute).",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0158",
+      "end_date": "2026-10-05",
+      "limit": 20,
+      "start_date": "2026-10-01"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 1981,
+   "tokens_out": 410,
+   "latency_ms": 59181,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 943,
+    "llm_ms": 1500,
+    "context_trims": 0
+   }
+  },
+  {
+   "user": "Yes, please dispute TXN-041977.",
+   "answer": "Your dispute for **TXN‑041977** (PageTurn Books – $23.51 on October 3, 2026) has been opened.\n\n**Dispute details**\n- **Dispute ID:** DSP‑B9133ED7  \n- **Transaction ID:** TXN‑041977  \n- **Amount:** $23.51  \n- **Reason:** Duplicate charge  \n\n**What happens next**\n\n| Milestone | Date (calendar) | What it means |\n|-----------|----------------|----------------|\n| **Provisional credit** | **2026‑11‑16** | We will place a temporary credit of $23.51 into your account while we investigate. |\n| **Investigation complete** | **2027‑01‑31** | Our investigation must be finished by this date. If we find an error, the provisional credit becomes permanent; if not, we will notify you of the outcome. |\n\nThese timeframes follow Regulation E’s error‑resolution rules for point‑of‑sale debit‑card transactions, which allow up to **90 calendar days** to complete the investigation after the notice of error [1005.11(c)#3] and require a **provisional credit within 10 business days** of receiving the notice [1005.11(c)#1][1005.11(c)#2].\n\n**What you can expect**\n- You will have full use of the provisional credit during the investigation.  \n- We will inform you within two business days after the provisional credit is posted.  \n- If the investigation determines the charge was indeed a duplicate, the credit will be finalized and the charge removed from your statement.  \n- If we determine no error occurred, we will provide a written explanation of our findings [1005.11(d)#1].\n\nIf you have any additional information (e.g., receipts, merchant communications) that could help our review, please let us know. Otherwise, we’ll proceed as outlined and keep you updated.",
+   "tool_calls": [
+    {
+     "tool": "open_dispute",
+     "args": {
+      "account_id": "ACC-0158",
+      "reason": "Duplicate charge on October 3, 2026",
+      "transaction_id": "TXN-041977"
+     },
+     "error": null
+    },
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E error resolution provisional credit timeline 10 business days 45 calendar days 90 calendar days"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 5880,
+   "tokens_out": 679,
+   "latency_ms": 3285,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0002,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 1280,
+    "api_calls": 3,
+    "retries": 0,
+    "server_ms": 1697,
+    "llm_ms": 2433,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [
+  "TXN-041977"
+ ],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(b)#2",
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.11(d)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected ['TXN-041977'], got ['TXN-041977']"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

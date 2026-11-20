@@ -1,0 +1,129 @@
+{
+ "scenario_id": "eval-policy-01",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-17T18:34:08+00:00",
+ "turns": [
+  {
+   "user": "How long does the bank have to investigate an error I report?",
+   "answer": "Under Regulation E, the bank must **investigate the error promptly** and, in most cases, **determine whether an error occurred within 10 business days of receiving your notice**. After the investigation is finished, the bank must **report the results to you within 3 business days** and, if an error is found, **correct it within 1 business day**【1005.11(c)#1】.\n\nIf the bank cannot finish its investigation within those first 10 business days, it may take **up to 45 calendar days** from the date it received your notice, provided it gives you a provisional credit for the disputed amount within the initial 10‑day window【1005.11(c)#1】.\n\nFor certain types of electronic fund transfers (e.g., transfers not initiated within a state, point‑of‑sale debit‑card transactions, or transfers occurring within 30 days of the first deposit), the investigation period can be **extended to 90 calendar days**【1005.11(c)#3】.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E investigation error timeline how long bank has to investigate error report"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 5135,
+   "tokens_out": 923,
+   "latency_ms": 59258,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "repair",
+     "detail": "unsupported day counts: ['45 business days', '90 business days']",
+     "rejected": "Under Regulation E, a bank must **investigate the error promptly** and, in most cases, **determine whether an error occurred within 10 business days of receiving your notice**. After the investigation is finished, the bank must **report the results to you within 3 business days** and, if an error is found, **correct it within 1 business day**【1005.11(c)#1】.\n\nIf the bank cannot finish its investigation within those first 10 business days, it may take **up to 45 business days** from the date it received your notice, provided it gives you a provisional credit for the disputed amount within the initial 10‑day window【1005.11(c)#1】.\n\nFor certain types of electronic fund transfers (e.g., transfers not initiated within a state, point‑of‑sale debit card transactions, or transfers occurring within 3"
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 2252,
+    "llm_ms": 2774,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.15(e)#3",
+  "1005.15(e)#4"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#1', '1005.11(c)#1', '1005.11(c)#3'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": true
+}

@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly opened the dispute and provided the accurate provisional credit date and investigation timeline consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 582,
+ "tokens_out": 40
+}

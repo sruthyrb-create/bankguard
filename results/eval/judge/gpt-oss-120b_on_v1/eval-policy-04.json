@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant incorrectly states that the customer has up to 120 days to report the transaction to keep liability limited, whereas the reference and Regulation E specify a 60-day window from the statement date for limiting liability.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 611,
+ "tokens_out": 64
+}

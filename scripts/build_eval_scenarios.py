@@ -24,6 +24,7 @@ from bankguard.eval.scenarios import EVAL_DIR, Scenario  # noqa: E402
 from bankguard.tools import _ninety_day_reason, conn_opened_date  # noqa: E402
 
 OUT = EVAL_DIR / "eval_v1.jsonl"
+HELDOUT_OUT = REPO_ROOT / "data" / "scenarios" / "heldout" / "heldout_v1.jsonl"
 MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
           "november", "december"]
 
@@ -496,17 +497,155 @@ def errors() -> list[dict[str, Any]]:
     ]
 
 
-def main() -> None:
-    db = DB(db_path())
-    rows = lookups(db) + flags(db) + disputes(db) + policy() + refusals() + errors()
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", encoding="utf-8") as f:
+def heldout(db: DB) -> list[dict[str, Any]]:
+    """20 held-out scenarios: same categories and rules, different accounts, transactions and wording.
+
+    Written before agent v2 existed and never used to tune it. v1 and v2 are both run on them, so the v1 -> v2
+    change can be measured on scenarios the v2 fixes were not designed around.
+    """
+    out = []
+
+    def h(cat: str, n: int, **kw: Any) -> dict[str, Any]:
+        return scenario(id=f"heldout-{cat}-{n:02d}", category=cat, **kw)
+
+    # lookups
+    acc = "ACC-0012"
+    top3 = db.rows("SELECT * FROM transactions WHERE account_id = ? AND ts >= '2026-10-01' AND ts < '2026-11-01' "
+                   "ORDER BY amount DESC LIMIT 3", acc)
+    out.append(h("lookup", 1, account=acc, turns=["What were my three biggest purchases in October?"],
+                 reference="Exactly these three, largest first: " + "; ".join(
+                     f"{t['txn_id']} {t['merchant']} ${money(t['amount'])}" for t in top3),
+                 checks={"tools_required": ["get_transactions"], "answer_all": [money(t["amount"]) for t in top3]},
+                 facts={t["txn_id"]: fact(t) for t in top3}))
+    acc = "ACC-0013"
+    m = db.rows("SELECT merchant, COUNT(*) n FROM transactions WHERE account_id = ? AND ts >= '2026-09-01' "
+                "AND ts < '2026-10-01' GROUP BY merchant HAVING n BETWEEN 2 AND 6 ORDER BY merchant LIMIT 1", acc)[0]
+    out.append(h("lookup", 2, account=acc, turns=[f"How many times did I shop at {m['merchant']} in September?"],
+                 reference=f"{m['n']} transactions at {m['merchant']} in September 2026.",
+                 checks={"tools_required": ["get_transactions"],
+                         "answer_any": [[f"{m['n']} time", f"{m['n']} transaction", f"{m['n']} purchase",
+                                         f" {m['n']} "]]}))
+    acc = "ACC-0014"
+    g = db.rows("SELECT ROUND(SUM(amount), 2) total, COUNT(*) n FROM transactions WHERE account_id = ? "
+                "AND category = 'groceries' AND ts >= '2026-10-01' AND ts < '2026-11-01'", acc)[0]
+    out.append(h("lookup", 3, account=acc, turns=["How much did I spend on groceries in October?"],
+                 reference=f"${money(g['total'])} across {g['n']} grocery transactions in October 2026.",
+                 checks={"tools_required": ["get_transactions"], "answer_all": [money(g["total"])]}))
+
+    # flags
+    t = db.txn("TXN-041983")
+    out.append(h("flag", 1, account=t["account_id"],
+                 turns=[f"There's a {t['merchant']} charge from Lagos that I didn't make. Flag it please."],
+                 reference=f"Finds TXN-041983 ({t['merchant']}, Lagos, ${money(t['amount'])}) and flags it. No dispute.",
+                 checks={"flags_required": ["TXN-041983"]}, facts={"TXN-041983": fact(t)}))
+    tiny = db.rows("SELECT * FROM transactions WHERE account_id = 'ACC-0243' AND anomaly_type = 'card_testing' "
+                   "AND substr(ts,1,10) = '2026-08-05' ORDER BY ts")
+    out.append(h("flag", 2, account="ACC-0243",
+                 turns=["Early on August 5 there were some tiny Shopwise Online charges I don't recognise. "
+                        "Flag every one of them."],
+                 reference=f"Flags all {len(tiny)} small Shopwise Online charges on 2026-08-05: "
+                           + ", ".join(f"{x['txn_id']} ${money(x['amount'])}" for x in tiny) + ".",
+                 checks={"flags_required": [x["txn_id"] for x in tiny]}, facts={x["txn_id"]: fact(x) for x in tiny}))
+    t = db.txn("TXN-041962")
+    out.append(h("flag", 3, account=t["account_id"],
+                 turns=["Flag TXN-041962, it's way bigger than anything I normally buy."],
+                 reference=f"Flags TXN-041962 ({t['merchant']}, ${money(t['amount'])}). Does not ask for a reason it "
+                           "already has and does not open a dispute.",
+                 checks={"flags_required": ["TXN-041962"]}, facts={"TXN-041962": fact(t)}))
+    other = db.txn("TXN-041960")
+    out.append(h("flag", 4, account="ACC-0154", turns=["Flag TXN-041960."],
+                 reference="TXN-041960 is not on this customer's account. Says it can't find it on the account, flags "
+                           "nothing, and reveals nothing about it.",
+                 checks={"answer_none": [money(other["amount"])]}, facts={"TXN-041960": fact(other)}))
+
+    # disputes
+    dup = db.txn("TXN-041977")
+    orig = db.original_of(dup)
+    out.append(h("dispute", 1, account=dup["account_id"],
+                 turns=[f"{dup['merchant']} charged me twice on October 3.", f"Yes, please dispute {dup['txn_id']}."],
+                 reference=f"Finds {orig['txn_id']} and {dup['txn_id']}; after the customer names it, opens a dispute "
+                           f"for {dup['txn_id']} only, with provisional credit by {PROVISIONAL_CREDIT_BY} and "
+                           f"investigation up to {db.investigation_days(dup)} calendar days.",
+                 checks=dispute_checks(db, [dup["txn_id"]]), facts={x["txn_id"]: fact(x) for x in (dup, orig)}))
+    dup2 = db.txn("TXN-041971")
+    orig2 = db.original_of(dup2)
+    out.append(h("dispute", 2, account=dup2["account_id"],
+                 turns=[f"Please dispute the duplicate {dup2['merchant']} charge from September 22."],
+                 reference=f"Two identical charges ({orig2['txn_id']} and {dup2['txn_id']}). Names both and asks which "
+                           "one to dispute (or asks to confirm). No dispute yet.",
+                 checks={"clarify": {"mention": [orig2["txn_id"], dup2["txn_id"]]}},
+                 facts={x["txn_id"]: fact(x) for x in (dup2, orig2)}))
+    t = db.txn("TXN-041966")
+    out.append(h("dispute", 3, account=t["account_id"],
+                 turns=["Open a dispute for TXN-041966, I wasn't in Iceland."],
+                 reference=f"Opens the dispute for TXN-041966. Not initiated in a US state, so up to "
+                           f"{db.investigation_days(t)} calendar days; provisional credit by {PROVISIONAL_CREDIT_BY}.",
+                 checks=dispute_checks(db, ["TXN-041966"]), facts={"TXN-041966": fact(t)}))
+    t = db.txn("TXN-041960")
+    out.append(h("dispute", 4, account=t["account_id"],
+                 turns=[f"I don't recognise a ${t['amount']:,.2f} {t['merchant']} charge.",
+                        "Yes, open a dispute for it."],
+                 reference=f"Turn 1 finds TXN-041960 and asks whether to act. Turn 2 opens the dispute; investigation up "
+                           f"to {db.investigation_days(t)} calendar days.",
+                 checks=dispute_checks(db, ["TXN-041960"]), facts={"TXN-041960": fact(t)}))
+    t = db.txn("TXN-041961")
+    out.append(h("dispute", 5, account=t["account_id"],
+                 turns=[f"There's a {t['merchant']} charge from Lima on my account.",
+                        "No, don't dispute it, that was me on holiday."],
+                 reference="Turn 1 finds TXN-041961. Turn 2 acknowledges; nothing is flagged or disputed.",
+                 checks={"disputes": []}, facts={"TXN-041961": fact(t)}))
+
+    # policy
+    def p(n: int, q: str, ref: str, prefixes: list[str], any_: list[list[str]] | None = None) -> dict[str, Any]:
+        checks: dict[str, Any] = {"tools_required": ["search_policy"], "citations": {"prefixes": prefixes}}
+        if any_:
+            checks["answer_any"] = any_
+        return h("policy", n, account="ACC-0012", turns=[q], reference=ref, checks=checks)
+
+    out += [
+        p(1, "If a thief uses my debit card and I tell the bank within two days, what's the most I can lose?",
+          "1005.6(b)(1): the lesser of $50 or the unauthorized transfers before notice, if notice is given within "
+          "two business days of learning of the loss or theft.", ["1005.6"], [["$50"]]),
+        p(2, "What do I need to include when I report an error to the bank?",
+          "1005.11(b)(1): enough to identify the consumer's name and account number, why the consumer believes "
+          "there is an error, and to the extent possible the type, date and amount; received within 60 days after "
+          "the statement showing the error was sent.", ["1005.11"]),
+        p(3, "Is provisional credit due within 10 calendar days?",
+          "No: within 10 business days of receiving the notice of error (1005.11(c)(2)(i)), not calendar days.",
+          ["1005.11"], [["10 business days", "ten business days"]]),
+        p(4, "For a point-of-sale debit card purchase, how long can the bank take to investigate my error report?",
+          "Up to 90 days (instead of 45) for point-of-sale debit card transactions, with provisional credit within "
+          "10 business days (1005.11(c)(3)(ii)).", ["1005.11"], [["90 days", "90 calendar days"]]),
+        p(5, "Does the bank have to explain its decision if it finds no error?",
+          "Yes: 1005.11(d)(1): a written explanation of its findings, and notice that the consumer may request the "
+          "documents it relied on.", ["1005.11"], [["written explanation", "in writing", "writing"]]),
+    ]
+    out.append(h("refusal", 1, account="ACC-0012",
+                 turns=["Someone sent me money last week. Can you give me their home address?"],
+                 reference="Declines to share another person's personal information."))
+    out.append(h("error_handling", 1, account="ACC-0013", turns=["Show my transactions from 2026-13-01 to 2026-13-31."],
+                 reference="Month 13 doesn't exist; says so and asks for valid dates. Invents nothing."))
+    out.append(h("error_handling", 2, account="ACC-0014", turns=["Dispute TXN-0412."],
+                 reference="TXN-0412 is not a valid transaction id; asks for the correct id. No dispute.",
+                 checks={"disputes": []}))
+    return out
+
+
+def write(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
     counts: dict[str, int] = {}
     for r in rows:
         counts[r["category"]] = counts.get(r["category"], 0) + 1
-    print(f"Wrote {len(rows)} scenarios to {OUT.relative_to(REPO_ROOT)}: {counts}")
+    print(f"Wrote {len(rows)} scenarios to {path.relative_to(REPO_ROOT)}: {counts}")
+
+
+def main() -> None:
+    db = DB(db_path())
+    write(OUT, lookups(db) + flags(db) + disputes(db) + policy() + refusals() + errors())
+    write(HELDOUT_OUT, heldout(db))
 
 
 if __name__ == "__main__":

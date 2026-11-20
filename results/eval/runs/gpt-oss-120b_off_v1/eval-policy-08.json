@@ -1,0 +1,107 @@
+{
+ "scenario_id": "eval-policy-08",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:16:28+00:00",
+ "turns": [
+  {
+   "user": "After the bank finishes investigating, how soon must it tell me the result?",
+   "answer": "Under Regulation E, once the bank has completed its investigation it must notify you of the results **within three business days** of finishing the investigation【1005.11(c)#1】.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E investigation result timeline how soon must bank tell customer result"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2630,
+   "tokens_out": 213,
+   "latency_ms": 19,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 0,
+    "retries": 0,
+    "server_ms": 0,
+    "llm_ms": 0,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(b)#2",
+  "1005.11(c)#1",
+  "1005.11(c)#3",
+  "1005.15(e)#3",
+  "1005.15(e)#4"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#1'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": true
+}

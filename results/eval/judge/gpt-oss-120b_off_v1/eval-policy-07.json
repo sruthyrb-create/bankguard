@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant omitted the requirement that the investigation period is extended to 20 business days (instead of 10) for new accounts, stating only the 90-day limit.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 660,
+ "tokens_out": 56
+}

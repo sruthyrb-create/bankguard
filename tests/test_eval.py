@@ -29,13 +29,22 @@ def test_scenario_file_has_60_valid_scenarios() -> None:
     assert set(load_yaml("eval")["pilot_ids"]) <= {s.id for s in scs}
 
 
+def test_heldout_set_is_valid_and_separate() -> None:
+    main, held = load_scenarios(), load_scenarios(scenario_set="heldout")
+    assert len(held) == 20 and all(s.id.startswith("heldout-") for s in held)
+    texts = {" ".join(t.lower().split()) for s in main for t in s.turns}
+    assert not [t for s in held for t in s.turns if " ".join(t.lower().split()) in texts]
+    assert not ({s.account for s in held if s.category in ("flag", "dispute")}
+                & {s.account for s in main if s.category in ("flag", "dispute")})
+
+
 def test_scenario_facts_match_bank_db() -> None:
     """Expected answers are built from bank.db; if the generator changes, this fails instead of the eval lying."""
     db = REPO_ROOT / load_yaml("models")["data"]["db_path"]
     if not db.exists():
         pytest.skip("bank.db not built (make data)")
     conn = sqlite3.connect(db)
-    for s in load_scenarios():
+    for s in load_scenarios() + load_scenarios(scenario_set="heldout"):
         for txn, f in s.facts.items():
             row = conn.execute("SELECT account_id, ts, merchant, amount FROM transactions WHERE txn_id = ?",
                                (txn,)).fetchone()
@@ -122,6 +131,9 @@ def test_grade_citations_and_clarify() -> None:
     assert "citations" in _failed(grade(sc, _run(_turn("45 days [1005.11(c)#2]"), retrieved=["1005.11(c)#1"])))
     assert "citations" in _failed(grade(sc, _run(_turn("45 days"), retrieved=["1005.11(c)#1"])))
     assert "citations" in _failed(grade(sc, _run(_turn("see [1005.6(b)#1]"), retrieved=["1005.6(b)#1"])))
+    # a precise sub-paragraph of a retrieved paragraph is grounded (run v1 off: policy-10 cited 1005.11(b)(2))
+    assert _failed(grade(sc, _run(_turn("yes [1005.11(b)(2)]"), retrieved=["1005.11(b)#1"]))) == []
+    assert "citations" in _failed(grade(sc, _run(_turn("yes [1005.11(c)(2)]"), retrieved=["1005.11(b)#1"])))
     cl = _sc(category="dispute", checks={"clarify": {"mention": ["TXN-000001", "TXN-000002"]}})
     assert _failed(grade(cl, _run(_turn("TXN-000001 or TXN-000002 — which one?")))) == []
     assert "clarify" in _failed(grade(cl, _run(_turn("TXN-000001 or TXN-000002."))))

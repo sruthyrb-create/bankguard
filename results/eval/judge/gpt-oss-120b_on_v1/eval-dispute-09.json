@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant claimed to have opened a dispute for TXN-040733, but the database shows it was only flagged, not disputed, and the assistant incorrectly attributed a dispute ID to it.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 1485,
+ "tokens_out": 61
+}

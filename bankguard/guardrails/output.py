@@ -73,15 +73,24 @@ class GroundingResult:
         return not self.unsupported
 
 
-def check_grounding(answer: str, retrieved_ids: set[str]) -> GroundingResult:
+def check_grounding(answer: str, retrieved_ids: set[str], allow_subparagraphs: bool = False) -> GroundingResult:
     """Every cited chunk id must have been retrieved (the agent passes ids seen in this conversation).
 
     A citation without the #n suffix (e.g. [1005.11(c)]) counts as supported if
     some retrieved chunk of that paragraph exists, since the model often drops it.
+    With allow_subparagraphs, a citation of a sub-paragraph of a retrieved paragraph also counts
+    ([1005.11(b)(2)] when 1005.11(b)#1 was retrieved): chunks are cut at paragraph letters, so a
+    precise citation into a retrieved chunk is grounded.
     """
     cited = [a or b for a, b in CITATION.findall(answer)]
     bases = {r.split("#")[0] for r in retrieved_ids}
-    unsupported = [c for c in cited if c not in retrieved_ids and not ("#" not in c and c in bases)]
+
+    def supported(c: str) -> bool:
+        if c in retrieved_ids or ("#" not in c and c in bases):
+            return True
+        return allow_subparagraphs and "#" not in c and any(c.startswith(b + "(") for b in bases)
+
+    unsupported = [c for c in cited if not supported(c)]
     return GroundingResult(cited, sorted(set(unsupported)))
 
 

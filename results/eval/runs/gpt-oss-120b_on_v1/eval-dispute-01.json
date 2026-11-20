@@ -1,0 +1,148 @@
+{
+ "scenario_id": "eval-dispute-01",
+ "category": "dispute",
+ "account": "ACC-0085",
+ "run": "gpt-oss-120b_on_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-17T18:17:46+00:00",
+ "turns": [
+  {
+   "user": "I think I was charged twice at QuickMart on 2026-09-21. Can you check?",
+   "answer": "I see two separate QuickMart purchases on 2026‑09‑21, both for **$119.39**:\n\n| Transaction ID | Time (local) | Amount |\n|----------------|--------------|--------|\n| **TXN-040744** | 21 :06 PM | $119.39 |\n| **TXN-009086** | 20 :42 PM | $119.39 |\n\nSince the amounts, merchant, and date are identical, it looks like a possible duplicate charge.  \n\nWould you like me to **flag these transactions as unusual** for further review, or would you prefer to **open a dispute** for one (or both) of them? Just let me know which action you’d like to take.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0085",
+      "end_date": "2026-09-22",
+      "limit": 50,
+      "start_date": "2026-09-20"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 1846,
+   "tokens_out": 333,
+   "latency_ms": 1736,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0001,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 1,
+    "retries": 0,
+    "server_ms": 540,
+    "llm_ms": 903,
+    "context_trims": 0
+   }
+  },
+  {
+   "user": "Yes, please open a dispute for TXN-040744, the second charge.",
+   "answer": "Your dispute for **TXN-040744** (QuickMart, $119.39) has been opened.  \n\n- **Dispute ID:** DSP‑B24B1D1E  \n- **Status:** Open  \n\n**What happens next**\n\n| Step | Deadline |\n|------|----------|\n| Provisional credit (if applicable) | By **2026‑11‑16** |\n| Investigation completed | By **2027‑01‑31** (90 calendar days from the transaction date) |\n\nThe investigation timeline follows Regulation E error‑resolution rules for point‑of‑sale debit card transactions, which allow up to **90 calendar days** for completion [Regulation E, 12 CFR 1005.11(c)]. If a provisional credit is issued, it will appear on your account by the date above.  \n\nIf you have any other questions or need further assistance, just let me know.",
+   "tool_calls": [
+    {
+     "tool": "open_dispute",
+     "args": {
+      "account_id": "ACC-0085",
+      "reason": "Duplicate charge – appears to be a duplicate transaction on the same day for the same amount",
+      "transaction_id": "TXN-040744"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2677,
+   "tokens_out": 348,
+   "latency_ms": 58449,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 884,
+    "llm_ms": 1791,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [
+  "TXN-040744"
+ ],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected ['TXN-040744'], got ['TXN-040744']"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

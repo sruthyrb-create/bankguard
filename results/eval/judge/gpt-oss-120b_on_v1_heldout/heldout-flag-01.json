@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": true,
+ "reason": "The assistant failed to find and flag the transaction as required by the reference and instead issued a refusal/guardrail message asking the customer to rephrase.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 690,
+ "tokens_out": 49
+}

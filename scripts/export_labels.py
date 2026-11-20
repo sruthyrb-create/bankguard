@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from bankguard.config import REPO_ROOT, load_yaml  # noqa: E402
 from bankguard.eval.judge import conversation_text  # noqa: E402
 from bankguard.eval.runner import load_records  # noqa: E402
-from bankguard.eval.scenarios import load_scenarios  # noqa: E402
+from bankguard.eval.scenarios import all_references  # noqa: E402
 
 FIELDS = ["label_id", "run", "scenario_id", "category", "reference", "conversation",
           "human_correct", "human_refused", "notes"]
@@ -36,7 +36,7 @@ def main() -> None:
     out = REPO_ROOT / cfg["path"]
     if out.exists() and not args.force:
         sys.exit(f"{out.relative_to(REPO_ROOT)} exists; use --force to overwrite it")
-    refs = {s.id: s.reference for s in load_scenarios(REPO_ROOT / load_yaml("eval")["scenarios"])}
+    refs = all_references()
     pool = [r for run in args.runs for r in load_records(run)]
     rng = random.Random(cfg["seed"])
     by_cat: dict[str, list] = {}

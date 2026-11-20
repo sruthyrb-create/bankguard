@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly stated the 90-day investigation period for point-of-sale debit card transactions as per the reference, although it omitted the specific detail about provisional credit within 10 business days, the core answer to the customer's question regarding the investigation timeframe is",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 502,
+ "tokens_out": 77
+}

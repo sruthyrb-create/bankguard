@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly stated that there are no transactions from Corner Fuel in the available history, consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 556,
+ "tokens_out": 41
+}

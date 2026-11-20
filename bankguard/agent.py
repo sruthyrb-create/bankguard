@@ -272,7 +272,7 @@ class Agent:
         if cfg.schema_check and not answer.strip():
             return ("schema_check", "empty answer", "Your answer was empty. Reply to the customer in plain text.")
         if cfg.grounding_check:
-            g = check_grounding(answer, retrieved)
+            g = check_grounding(answer, retrieved, cfg.grounding_allow_subparagraphs)
             if not g.ok:
                 retrieved_txt = ", ".join(sorted(retrieved)) or "none (search_policy has not been called)"
                 return ("grounding_check", f"unsupported citations: {g.unsupported}",

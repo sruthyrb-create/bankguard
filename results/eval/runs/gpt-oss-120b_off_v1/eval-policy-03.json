@@ -1,0 +1,107 @@
+{
+ "scenario_id": "eval-policy-03",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_off_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [],
+ "created": "2026-11-19T05:16:28+00:00",
+ "turns": [
+  {
+   "user": "If the bank needs more time to investigate, when do I get provisional credit?",
+   "answer": "Under Regulation E, when you notify the bank of a possible error the institution must:\n\n1. **Provide a provisional credit** within **10 business days** of receiving your notice of error, even if it expects the investigation to take longer. The credit is for the full amount you claim is in error (including any interest, if applicable). [1005.11(c)#1]\n\n2. If the bank cannot finish its investigation within those first 10 business days, it may extend the overall investigation period to **up to 45 business days** from the date it received your notice. During that extended period you keep full use of the provisional credit. [1005.11(c)#2]\n\nSo, if the bank needs more time, you should see the provisional credit posted **no later than the 10th business day after they received your error notice**. They will then inform you of the credit amount and date, and you can use the funds while the investigation continues. [1005.11(c)#1]",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E provisional credit timing investigation more time"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2768,
+   "tokens_out": 421,
+   "latency_ms": 17,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 0,
+    "retries": 0,
+    "server_ms": 0,
+    "llm_ms": 0,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.11(d)#1",
+  "1005.7(a)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": false,
+   "detail": "45 business days"
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#1', '1005.11(c)#2', '1005.11(c)#1'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}

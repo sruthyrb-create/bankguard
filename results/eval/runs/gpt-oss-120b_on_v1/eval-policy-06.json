@@ -1,0 +1,123 @@
+{
+ "scenario_id": "eval-policy-06",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v1",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-19T04:46:41+00:00",
+ "turns": [
+  {
+   "user": "What if I wait a week before reporting my lost debit card?",
+   "answer": "If you wait a week (seven days) after you discover that your debit card is lost before you tell us, you will be outside the “timely‑notice” window that Regulation E defines.\n\n**Liability rules**\n\n* **Notice within 2 business days** – If you let the bank know within two business days of learning of the loss, your liability is limited to the lesser of $50 or the amount of any unauthorized transfers that occur before you give notice【1005.6(b)#1】.  \n\n* **Notice after 2 business days** – If you do not give notice within those two business days, your liability can rise to the lesser of $500 or the sum of:  \n  1. $50 (or the amount of unauthorized transfers that happen in the first two business days, whichever is less), and  \n  2. any unauthorized transfers that occur after the two‑day period until you finally notify the institution【1005.6(b)#1】.  \n\n* **Extended notice period** – Some service providers may extend the notice‑of‑loss period from two business days to four business days, but even that extension does not cover a full week【1005.14(b)#2】.  \n\n**What that means for a week‑long delay**\n\nBecause a week exceeds both the standard two‑day window and the possible four‑day extension, your liability could be up to **$500** (subject to the $50 cap for the first two days). Any unauthorized transactions that occur after you finally report the loss will be your responsibility up to that $500 limit.\n\n**What you should do now**\n\nReport the lost card as soon as possible. The sooner we receive notice, the lower your potential liability and the quicker we can block the card and issue a replacement. If you notice any unauthorized charges, let us know immediately so we can investigate and, if appropriate, provide a provisional credit.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "lost debit card reporting timeframe liability week"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 3008,
+   "tokens_out": 621,
+   "latency_ms": 4777,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1528,
+    "llm_ms": 2509,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.14(b)#1",
+  "1005.14(b)#2",
+  "1005.6(b)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.6(b)#1', '1005.6(b)#1', '1005.14(b)#2'], unsupported [], prefixes ['1005.6']"
+  }
+ ],
+ "rule_pass": true
+}

@@ -3,6 +3,7 @@
   python scripts/run_eval.py --guardrails on --pilot      # the 10 pilot scenarios
   python scripts/run_eval.py --guardrails on              # all 60 (skips finished ones; resumable)
   python scripts/run_eval.py --guardrails off             # same scenarios, every guardrail off
+  python scripts/run_eval.py --guardrails on --set heldout   # the 20 held-out scenarios
   options: --ids eval-policy-01 eval-policy-02   --force (re-run finished ones)
 
 Stops cleanly when the daily token budget in configs/eval.yaml is reached or Groq
@@ -26,21 +27,23 @@ from bankguard.guardrails import GuardrailConfig, Guardrails  # noqa: E402
 from bankguard.llm import make_llm  # noqa: E402
 
 
-def run_name(model: str, guardrails: str, version: str) -> str:
-    return f"{model.split('/')[-1]}_{guardrails}_{version}"
+def run_name(model: str, guardrails: str, version: str, scenario_set: str = "main") -> str:
+    suffix = "" if scenario_set == "main" else f"_{scenario_set}"
+    return f"{model.split('/')[-1]}_{guardrails}_{version}{suffix}"
 
 
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--guardrails", choices=["on", "off"], required=True)
     p.add_argument("--pilot", action="store_true")
+    p.add_argument("--set", default="main", choices=["main", "heldout"], dest="scenario_set")
     p.add_argument("--ids", nargs="*")
     p.add_argument("--force", action="store_true", help="re-run scenarios that already have a record")
     p.add_argument("--backend", default="groq")
     args = p.parse_args()
 
     cfg, models = load_yaml("eval"), load_yaml("models")
-    scenarios = load_scenarios(REPO_ROOT / cfg["scenarios"])
+    scenarios = load_scenarios(scenario_set=args.scenario_set)
     wanted = set(args.ids or (cfg["pilot_ids"] if args.pilot else [s.id for s in scenarios]))
     unknown = wanted - {s.id for s in scenarios}
     if unknown:
@@ -48,7 +51,7 @@ def main() -> None:
     scenarios = [s for s in scenarios if s.id in wanted]
 
     llm = make_llm(args.backend)
-    name = run_name(llm.model, args.guardrails, cfg["agent_version"])
+    name = run_name(llm.model, args.guardrails, cfg["agent_version"], args.scenario_set)
     todo = [s for s in scenarios if args.force or not record_path(name, s.id).exists()]
     print(f"Run {name}: {len(scenarios)} selected, {len(scenarios) - len(todo)} already done, {len(todo)} to run")
     if not todo:

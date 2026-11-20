@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identified that the deadline is 10 business days, not calendar days, which aligns with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 512,
+ "tokens_out": 49
+}

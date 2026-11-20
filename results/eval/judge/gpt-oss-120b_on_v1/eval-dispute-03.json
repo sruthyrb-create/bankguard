@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly opened the dispute for the specified transaction and provided the accurate provisional credit date (2026-11-16) and investigation timeline (up to 45 days) consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 848,
+ "tokens_out": 64
+}

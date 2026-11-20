@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant incorrectly states that the 45-day and 90-day investigation periods are in 'business days,' whereas the reference specifies they are in 'calendar days' (or simply days).",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 651,
+ "tokens_out": 58
+}

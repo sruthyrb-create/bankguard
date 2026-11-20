@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly stated the three-business-day timeline for reporting investigation results under Regulation E, consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 426,
+ "tokens_out": 41
+}
