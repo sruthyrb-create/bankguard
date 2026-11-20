@@ -341,4 +341,6 @@ def test_day_counts_in_answer_checks_are_compared_by_meaning() -> None:
     assert contains("ten business days", "10 business days")
     assert not contains("45 business days", "45 days")          # business never counts as calendar
     assert not contains("within 10 calendar days", "10 business days")
+    assert contains("investigation can take up to **45** days", "45 calendar days")    # fix 3: markdown
+    assert contains("up to **45 calendar days**", "45 days")
     assert contains("TXN‑000123 for $1,084.51", "1084.51") and contains("TXN-000123", "TXN-000123")

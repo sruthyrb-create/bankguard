@@ -95,3 +95,6 @@
 ## Phase 5, part 4 fix 2 (2026-11-19)
 - Eval grader compares expected day counts by meaning (`grading.contains`); regression test from heldout-dispute-04. Re-applied to all saved runs with `regrade_eval.py`.
 
+
+## Phase 5, part 4 fix 3 (2026-11-20)
+- `grading.contains` parses day counts from the normalised answer, so markdown emphasis no longer hides them (fix 2 regressed v1 held-out heldout-dispute-04). Test added.

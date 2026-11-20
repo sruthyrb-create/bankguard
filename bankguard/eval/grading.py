@@ -51,13 +51,14 @@ def contains(answer: str, item: str) -> bool:
 
     Day counts ("45 days", "45 calendar days", "10 business days") are compared by meaning with the same
     parser as the day-count guardrail, so "45-calendar-day limit" or "forty-five days" count. In the v2 held-out
-    run a correct "45-calendar-day limit" failed a plain substring match. Everything else is a normalised
+    run a correct "45-calendar-day limit" failed a plain substring match. The answer is normalised first so
+    markdown emphasis ("up to **45** days") does not hide a count. Everything else is a normalised
     substring match.
     """
     m = _DAY_ITEM.match(normalise(item))
     if m:
         n, unit = int(m.group(1)), m.group(2)
-        counts = day_counts(answer)
+        counts = day_counts(normalise(answer))     # normalise strips markdown: "**45** days"
         if unit == "business":
             return (n, "business") in counts
         return (n, "calendar") in counts or (n, "plain") in counts

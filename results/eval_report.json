@@ -1,5 +1,5 @@
 {
-  "created": "2026-11-20T14:30:12+00:00",
+  "created": "2026-11-20T14:34:50+00:00",
   "runs": {
     "gpt-oss-120b_off_v1": {
       "n_scenarios": 60,
@@ -698,18 +698,18 @@
     "gpt-oss-120b_on_v1_heldout": {
       "n_scenarios": 20,
       "success": {
-        "n": 14,
-        "rate": 0.7,
+        "n": 15,
+        "rate": 0.75,
         "pending_judge": 0
       },
-      "rule_pass_rate": 0.8,
+      "rule_pass_rate": 0.85,
       "by_category": {
         "dispute": {
           "n": 5,
-          "success": 4,
-          "rule_pass": 4,
+          "success": 5,
+          "rule_pass": 5,
           "pending_judge": 0,
-          "success_rate": 0.8
+          "success_rate": 1.0
         },
         "error_handling": {
           "n": 2,
@@ -809,20 +809,6 @@
         "server_ms_mean": 1221
       },
       "failed": [
-        {
-          "id": "heldout-dispute-04",
-          "failed_checks": [
-            "answer_any"
-          ],
-          "judge": {
-            "correct": true,
-            "refused": false,
-            "reason": "The assistant correctly identified the transaction in turn 1 and successfully opened the dispute in turn 2, providing the correct 45-calendar-day investigation timeline as required by the reference.",
-            "judge_model": "qwen/qwen3.8-27b",
-            "tokens_in": 1409,
-            "tokens_out": 55
-          }
-        },
         {
           "id": "heldout-error_handling-02",
           "failed_checks": [],

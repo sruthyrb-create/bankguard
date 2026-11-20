@@ -179,11 +179,11 @@
   },
   {
    "check": "answer_any",
-   "passed": false,
-   "detail": "none of [['45 calendar days', '45 days']]"
+   "passed": true,
+   "detail": ""
   }
  ],
- "rule_pass": false,
+ "rule_pass": true,
  "checks_before_regrade": [
   {
    "check": "no_errors",
