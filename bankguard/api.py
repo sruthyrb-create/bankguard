@@ -55,7 +55,8 @@ def create_app(agent_factory: Any = None, db_path: str | None = None) -> FastAPI
             guardrails.append(Guardrails.from_config())
         return Agent(make_llm(backend), db, tracer, cfg["defaults"]["max_steps"],
                      policy_index=_default_policy_index(), guardrails=guardrails[0],
-                     context_budget=cfg["defaults"].get("context_budget_tokens"))
+                     context_budget=cfg["defaults"].get("context_budget_tokens"),
+                     graceful_step_limit=cfg["defaults"].get("graceful_step_limit", False))
 
     factory = agent_factory or default_factory
     app = FastAPI(title="BankGuard", description="Support agent for the fictional Northwind Bank")

@@ -14,8 +14,10 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from bankguard.context import encode_tool_result, fit_context
-from bankguard.guardrails import (EMPTY_FALLBACK, GROUNDING_FALLBACK, Guardrails, GuardrailConfig, check_action,
-                                  check_day_counts, check_grounding, check_tool_args, redact_leaks)
+from bankguard.guardrails import (EMPTY_FALLBACK, GROUNDING_FALLBACK, ID_FALLBACK, Guardrails, GuardrailConfig,
+                                  check_action, check_action_claims, check_day_counts, check_grounding,
+                                  check_tool_args, redact_leaks, unknown_txn_ids)
+from bankguard.guardrails.pii import normalize_dashes
 from bankguard.llm import LLMResponse, ToolCallFormatError
 from bankguard.tools import TOOL_SCHEMAS, ToolContext, call_tool
 from bankguard.tracing import Tracer
@@ -24,7 +26,8 @@ SYSTEM_PROMPT = """You are the customer-support assistant for Northwind Bank, a 
 Today is {today}. The customer you are talking to owns account {account_id}; use that account_id in tool calls.
 
 What you can do:
-- Look up the customer's transactions (get_transactions).
+- Look up the customer's transactions (get_transactions). It can filter by transaction_id, merchant, city,
+  dates and minimum amount. Use the filters instead of paging through long lists.
 - Flag a charge the customer finds unusual (flag_unusual_charge).
 - Open a dispute (open_dispute) ONLY after the customer has explicitly said yes to opening a dispute
   for a specific transaction in this conversation. If they have not, describe the charge and ask them to confirm.
@@ -38,11 +41,48 @@ Rules:
 - Do not give investment, tax or legal advice; say it is outside what you can help with.
 - State numbers, amounts, deadlines and day counts exactly as the tool output or retrieved text gives them.
   Do not convert calendar days into business days or the reverse.
-- Use transaction ids (e.g. TXN-000123) when you refer to specific charges.
-- Be concise. If a tool returns an error, explain it plainly or try a corrected call."""
+- Use transaction ids when you refer to specific charges. If you need to show the id format, write TXN-######.
+- Be concise. If a tool returns an error, explain it plainly or try a corrected call.
+
+Acting on transactions:
+- Before acting on a transaction id the customer gives you, look it up with get_transactions(transaction_id=...).
+  If it is not on this account, say you can't find it on their account and do nothing else with it.
+- When the customer asks you to flag a charge, or has confirmed a dispute, do it. Do not ask for a reason;
+  infer it from the conversation or leave it out.
+- Never flag or dispute anything the customer did not ask for.
+- To act on several transactions, call the tool once per transaction; you may make several calls in one step.
+- After acting, report exactly which calls succeeded. Never say you flagged or disputed something unless
+  that tool call succeeded in this conversation.
+
+Policy questions:
+- Always call search_policy before answering a Regulation E question, even if you think you know the answer.
+- If the customer's question assumes something the regulation contradicts (for example business days where
+  it says days), start by correcting it ("No - it is 45 days, not 45 business days.")."""
 
 MAX_STEPS_MESSAGE = ("Sorry, I couldn't finish that request. Could you rephrase it, "
                      "or ask about one thing at a time?")
+
+
+STEP_LIMIT_NOTE = ("You have used all your tool steps for this message. Do not call any tools. Reply to the "
+                   "customer now: say exactly what you completed and what you found, and what is still open.")
+
+
+def _user_txn_ids(session: "Session") -> set[str]:
+    import re
+    text = " ".join(str(m.get("content") or "") for m in session.messages if m.get("role") == "user")
+    return {t.upper() for t in re.findall(r"TXN-\d+", normalize_dashes(text), re.I)}
+
+
+def _actions_summary(session: "Session") -> str:
+    """Factual fallback when the reply misreports actions: what really happened, from tool results."""
+    parts = []
+    if session.done_flags:
+        parts.append("flagged " + ", ".join(sorted(session.done_flags)))
+    if session.done_disputes:
+        parts.append("disputes open for " + ", ".join(sorted(session.done_disputes)))
+    done = "; ".join(parts) if parts else "nothing has been flagged or disputed yet"
+    return (f"To be precise about what I have done in this conversation: {done}. "
+            "Tell me if you want me to flag or dispute anything else.")
 
 
 def _source_text(tool: str, args: dict[str, Any], result: dict[str, Any]) -> str:
@@ -86,6 +126,10 @@ class Session:
     # accept anything the model has actually been shown in this session (the text is in its context).
     retrieved_ids: set[str] = field(default_factory=set)
     sources: list[str] = field(default_factory=list)
+    # Write actions that really happened in this conversation (successful tool calls), for the v2
+    # action-claim check. A dispute the tool reports as already open counts as existing.
+    done_flags: set[str] = field(default_factory=set)
+    done_disputes: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -111,11 +155,15 @@ class Agent:
 
     def __init__(self, llm: ChatModel, db_path: str, tracer: Tracer, max_steps: int = 6,
                  policy_index: Any = None, guardrails: Guardrails | None = None,
-                 context_budget: int | None = None) -> None:
+                 context_budget: int | None = None, graceful_step_limit: bool = False) -> None:
         self.llm, self.db_path, self.tracer, self.max_steps = llm, db_path, tracer, max_steps
         self.policy_index = policy_index
         # Estimated-token ceiling per request; None = no trimming (see bankguard/context.py).
         self.context_budget = context_budget
+        # v2: when max_steps runs out, make one last call without tools so the customer gets a real reply
+        # about what was done, instead of the generic MAX_STEPS_MESSAGE (run v1: eval-flag-04 made all five
+        # flags and then had no step left to say so).
+        self.graceful_step_limit = graceful_step_limit
         # No guardrails object means every guardrail is off (the Phase 3 behaviour).
         self.guardrails = guardrails or Guardrails(GuardrailConfig.all_off())
 
@@ -194,7 +242,7 @@ class Agent:
                              cached_tokens=resp.cached_tokens, est_tokens=fit["est_tokens_after"], error=None)
 
             if not resp.tool_calls:
-                problem = self._answer_problem(resp.content or "", retrieved, sources)
+                problem = self._answer_problem(resp.content or "", retrieved, sources, session)
                 if problem and repairs < cfg.max_repairs:
                     # Ask the model to fix its answer once; this uses one of max_steps.
                     repairs += 1
@@ -203,18 +251,7 @@ class Agent:
                     session.messages.append({"role": "assistant", "content": resp.content})
                     session.messages.append({"role": "system", "content": problem[2]})
                     continue
-                answer = resp.content or ""
-                if problem:
-                    answer = EMPTY_FALLBACK if problem[0] == "schema_check" else GROUNDING_FALLBACK
-                    self._guard_event(session, events, guardrail=problem[0], action="fallback", detail=problem[1],
-                                      rejected=(resp.content or "")[:800])
-                if cfg.pii_leak_check:
-                    leak = redact_leaks(answer, session.account_id)
-                    if leak.leaked:
-                        self._guard_event(session, events, guardrail="pii_leak_check", action="redact",
-                                          found=leak.found)
-                        answer = leak.text
-                session.messages.append({"role": "assistant", "content": answer})
+                answer = self._final_answer(session, events, resp.content or "", problem)
                 return self._finish(session, answer, calls, n_llm, tok_in, tok_out, t_turn, events=events,
                                     stats=stats)
 
@@ -243,8 +280,54 @@ class Agent:
                 session.messages.append({"role": "tool", "tool_call_id": tc.id,
                                          "content": encode_tool_result(tc.name, result)})
 
+        if self.graceful_step_limit:
+            session.step += 1
+            session.messages.append({"role": "system", "content": STEP_LIMIT_NOTE})
+            to_send, _ = fit_context(session.messages, None, self.context_budget)
+            try:
+                resp = self.llm.chat(to_send, None)
+                n_llm += 1
+                tok_in += resp.tokens_in
+                tok_out += resp.tokens_out
+                if not resp.cached:
+                    stats["api_calls"] += 1
+                stats["step_limit"] = 1
+                self.tracer.emit(session.session_id, session.step, "step_limit", model=self.llm.model,
+                                 tokens_in=resp.tokens_in, tokens_out=resp.tokens_out)
+                problem = (None if resp.tool_calls
+                           else self._answer_problem(resp.content or "", retrieved, sources, session))
+                answer = self._final_answer(session, events, resp.content or "", problem)
+                return self._finish(session, answer, calls, n_llm, tok_in, tok_out, t_turn, events=events,
+                                    stats=stats)
+            except Exception as exc:  # fall through to the fixed message
+                self.tracer.emit(session.session_id, session.step, "error", model=self.llm.model,
+                                 error=f"{type(exc).__name__}: {exc}")
         return self._finish(session, MAX_STEPS_MESSAGE, calls, n_llm, tok_in, tok_out, t_turn, error="max_steps",
                             events=events, stats=stats)
+
+    def _final_answer(self, session: Session, events: list[dict[str, Any]], answer: str,
+                      problem: tuple[str, str, str] | None) -> str:
+        """Apply the fallback for an unrepaired problem, then leak redaction; store and return the reply."""
+        cfg = self.guardrails.config
+        rejected = answer
+        if problem:
+            if problem[0] == "schema_check":
+                answer = EMPTY_FALLBACK
+            elif problem[0] == "id_check":
+                answer = ID_FALLBACK
+            elif problem[0] == "action_claim_check":
+                answer = _actions_summary(session)
+            else:
+                answer = GROUNDING_FALLBACK
+            self._guard_event(session, events, guardrail=problem[0], action="fallback", detail=problem[1],
+                              rejected=rejected[:800])
+        if cfg.pii_leak_check:
+            leak = redact_leaks(answer, session.account_id)
+            if leak.leaked:
+                self._guard_event(session, events, guardrail="pii_leak_check", action="redact", found=leak.found)
+                answer = leak.text
+        session.messages.append({"role": "assistant", "content": answer})
+        return answer
 
     def _guarded_call(self, session: Session, ctx: ToolContext, name: str, args: dict[str, Any],
                       events: list[dict[str, Any]]) -> dict[str, Any]:
@@ -264,9 +347,16 @@ class Agent:
                                   detail=decision.reason)
                 return {"error": f"Blocked by action policy: {decision.reason}. Do not open the dispute yet. "
                                  "Ask the customer to confirm explicitly, naming the transaction id."}
-        return call_tool(ctx, name, args)
+        result = call_tool(ctx, name, args)
+        txn = normalize_dashes(str(args.get("transaction_id", ""))).upper()
+        if name == "flag_unusual_charge" and "error" not in result:
+            session.done_flags.add(txn)
+        if name == "open_dispute" and ("error" not in result or "already" in str(result.get("error", "")).lower()):
+            session.done_disputes.add(txn)
+        return result
 
-    def _answer_problem(self, answer: str, retrieved: set[str], sources: list[str]) -> tuple[str, str, str] | None:
+    def _answer_problem(self, answer: str, retrieved: set[str], sources: list[str],
+                        session: Session | None = None) -> tuple[str, str, str] | None:
         """Return (guardrail, detail, feedback for the model) if the final answer fails a check."""
         cfg = self.guardrails.config
         if cfg.schema_check and not answer.strip():
@@ -287,7 +377,36 @@ class Agent:
                         "conversation says that. Regulation E's unqualified 'N days' are calendar days, not business days. "
                         "Call search_policy if you need the text, then restate every day count exactly as the "
                         "source gives it. Rewrite the answer.")
+        if cfg.id_check and session is not None:
+            bad_ids = unknown_txn_ids(answer, self._own_txn_ids(session.account_id, answer), _user_txn_ids(session))
+            if bad_ids:
+                return ("id_check", f"ids not on the account: {bad_ids}",
+                        f"Your answer mentions {', '.join(bad_ids)}, which is not a transaction on this account. "
+                        "Check ids with get_transactions(transaction_id=...) and use only ids from tool results. "
+                        "To show the id format, write TXN-######. Rewrite the answer.")
+        if cfg.action_claim_check and session is not None:
+            claims = check_action_claims(answer, session.done_flags, session.done_disputes)
+            if claims:
+                return ("action_claim_check", f"claims without a successful tool call: {claims}",
+                        f"Your answer {'; '.join(claims)}, but no successful tool call in this conversation did "
+                        f"that. Done so far: flagged {sorted(session.done_flags) or 'none'}, disputes "
+                        f"{sorted(session.done_disputes) or 'none'}. Either make the missing tool calls now, or "
+                        "rewrite the answer so it reports only what was actually done.")
         return None
+
+    def _own_txn_ids(self, account_id: str, answer: str) -> set[str]:
+        """Which transaction ids mentioned in the answer belong to the account (one small query)."""
+        import re
+        ids = sorted({t.upper() for t in re.findall(r"TXN-\d{6}", normalize_dashes(answer), re.I)})
+        if not ids:
+            return set()
+        from bankguard.tools import connect
+        conn = connect(self.db_path)
+        try:
+            q = f"SELECT txn_id FROM transactions WHERE account_id = ? AND txn_id IN ({','.join('?' * len(ids))})"
+            return {r[0] for r in conn.execute(q, [account_id, *ids]).fetchall()}
+        finally:
+            conn.close()
 
     def _finish(self, session: Session, answer: str, calls: list[dict[str, Any]], n_llm: int, tok_in: int,
                 tok_out: int, t_turn: float, error: str | None = None, blocked_by: str | None = None,

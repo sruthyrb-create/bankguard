@@ -46,7 +46,7 @@ def _db_state(db: Path, account: str) -> dict[str, Any]:
 
 def run_scenario(sc: Scenario, llm: Any, guardrails: Guardrails, base_db: str | Path, policy_index: Any,
                  run_name: str, max_steps: int = 6, trace_dir: Path | None = None,
-                 context_budget: int | None = None) -> dict[str, Any]:
+                 context_budget: int | None = None, graceful_step_limit: bool = False) -> dict[str, Any]:
     """Run every turn of one scenario and return the graded record (raises RunStopped on budget/429)."""
     tmp = Path(tempfile.mkdtemp(prefix="bankguard-eval-"))
     db = tmp / "bank.db"
@@ -55,7 +55,7 @@ def run_scenario(sc: Scenario, llm: Any, guardrails: Guardrails, base_db: str | 
     trace_path.unlink(missing_ok=True)
     tracer = Tracer(f"eval-{run_name}-{sc.id}", trace_path)
     agent = Agent(llm, str(db), tracer, max_steps, policy_index=policy_index, guardrails=guardrails,
-                  context_budget=context_budget)
+                  context_budget=context_budget, graceful_step_limit=graceful_step_limit)
     session = Session(account_id=sc.account)
     turns = []
     try:

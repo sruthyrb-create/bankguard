@@ -20,9 +20,11 @@ class FakeLLM:
     def __init__(self, script: list[LLMResponse]) -> None:
         self.script = list(script)
         self.requests: list[list[dict[str, Any]]] = []
+        self.tools_seen: list[Any] = []
 
     def chat(self, messages, tools=None) -> LLMResponse:
         self.requests.append([dict(m) for m in messages])
+        self.tools_seen.append(tools)
         if not self.script:
             raise AssertionError("FakeLLM ran out of scripted responses")
         return self.script.pop(0)

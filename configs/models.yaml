@@ -16,7 +16,8 @@ local:
 defaults:
   temperature: 0.0
   seed: 42
-  max_steps: 6
+  max_steps: 8                 # v2 (was 6): five flags need six tool steps plus a reply
+  graceful_step_limit: true    # v2: one tool-free call for a real reply when steps run out
   request_timeout_s: 60
   # Estimated tokens per request (chars / 3, an overestimate). Groq's free tier rejects any single request over
   # 8,000 tokens (HTTP 413), so older tool results are trimmed above this. See bankguard/context.py.

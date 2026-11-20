@@ -2,8 +2,9 @@
 scenarios: data/scenarios/eval/eval_v1.jsonl
 
 # Part of every run name (<model>_<on|off>_<version>). Bump it whenever the agent changes (prompt, tools,
-# context handling), so results from different agent versions never mix. v1 = the baseline.
-agent_version: v1
+# context handling), so results from different agent versions never mix. v1 = the baseline;
+# v2 = prompt rules, tool filters, optional reason, id and action-claim checks, 8 steps + graceful limit.
+agent_version: v2
 
 # One or more per category; run first to measure real tokens per scenario.
 pilot_ids:

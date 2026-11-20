@@ -139,7 +139,8 @@ def test_each_input_guardrail_can_be_switched_off() -> None:
 def test_config_file_loads_and_rejects_unknown_keys() -> None:
     cfg = GuardrailConfig.from_yaml(load_yaml("guardrails"))
     assert set(cfg.enabled()) == {"pii_masking", "injection_classifier", "topic_filter", "schema_check",
-                                  "grounding_check", "day_count_check", "pii_leak_check", "action_policy"}
+                                  "grounding_check", "day_count_check", "id_check", "action_claim_check",
+                                  "pii_leak_check", "action_policy"}
     with pytest.raises(ValueError, match="Unknown"):
         GuardrailConfig.from_yaml({"input": {"typo_filter": True}})
 

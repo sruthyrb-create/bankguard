@@ -96,7 +96,8 @@ def main() -> None:
     guardrails = Guardrails(GuardrailConfig.all_off()) if args.no_guardrails else Guardrails.from_config()
     print(f"Guardrails on: {', '.join(guardrails.config.enabled()) or 'none'}")
     agent = Agent(llm, db, tracer, cfg["defaults"]["max_steps"], policy_index=policy_index, guardrails=guardrails,
-                  context_budget=cfg["defaults"].get("context_budget_tokens"))
+                  context_budget=cfg["defaults"].get("context_budget_tokens"),
+                  graceful_step_limit=cfg["defaults"].get("graceful_step_limit", False))
 
     if args.demo_guardrails:
         account, turns = guardrail_turns(db)

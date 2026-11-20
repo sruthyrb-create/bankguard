@@ -70,8 +70,13 @@ def _add_business_days(start: date, n: int) -> date:
 
 def get_transactions(ctx: ToolContext, account_id: str, start_date: str | None = None,
                      end_date: str | None = None, min_amount: float | None = None,
-                     limit: int | None = MAX_ROWS) -> dict[str, Any]:
-    """Return up to `limit` (max 50) of the account's transactions, newest first, with optional filters."""
+                     limit: int | None = MAX_ROWS, transaction_id: str | None = None,
+                     merchant: str | None = None, city: str | None = None) -> dict[str, Any]:
+    """Return up to `limit` (max 50) of the account's transactions, newest first, with optional filters.
+
+    v2 filters: transaction_id (exact; an id that is not on this account returns count 0, which is how the
+    agent tells the customer it can't find it), merchant and city (case-insensitive substring).
+    """
     _authorize(ctx, account_id)
     if limit is None:
         limit = MAX_ROWS
@@ -95,6 +100,15 @@ def get_transactions(ctx: ToolContext, account_id: str, start_date: str | None =
     if min_amount is not None:
         sql += " AND amount >= ?"
         params.append(float(min_amount))
+    if transaction_id:
+        sql += " AND txn_id = ?"
+        params.append(str(transaction_id).strip().upper())
+    if merchant:
+        sql += " AND LOWER(merchant) LIKE ?"
+        params.append(f"%{str(merchant).strip().lower()}%")
+    if city:
+        sql += " AND LOWER(city) LIKE ?"
+        params.append(f"%{str(city).strip().lower()}%")
     sql += " ORDER BY ts DESC, txn_id DESC"
     conn = connect(ctx.db_path)
     try:
@@ -105,32 +119,38 @@ def get_transactions(ctx: ToolContext, account_id: str, start_date: str | None =
             "transactions": rows[:limit]}
 
 
-def flag_unusual_charge(ctx: ToolContext, account_id: str, transaction_id: str, reason: str) -> dict[str, Any]:
-    """Record that the customer considers a transaction unusual. Write action."""
+DEFAULT_REASON = "Customer did not give a specific reason"
+
+
+def flag_unusual_charge(ctx: ToolContext, account_id: str, transaction_id: str,
+                        reason: str | None = None) -> dict[str, Any]:
+    """Record that the customer considers a transaction unusual. Write action.
+
+    reason is optional (v2): in run v1 the agent asked customers for a reason instead of acting.
+    """
     _authorize(ctx, account_id)
-    if not reason.strip():
-        raise ToolError("reason must not be empty.")
+    reason = (reason or "").strip() or DEFAULT_REASON
     conn = connect(ctx.db_path)
     try:
         _get_owned_txn(conn, account_id, transaction_id)
         flag_id = f"FLG-{uuid.uuid4().hex[:8].upper()}"
         conn.execute("INSERT INTO flags VALUES (?,?,?,?,?)",
-                     (flag_id, account_id, transaction_id, reason.strip(), ctx.now.isoformat()))
+                     (flag_id, account_id, transaction_id, reason, ctx.now.isoformat()))
         conn.commit()
     finally:
         conn.close()
     return {"flag_id": flag_id, "transaction_id": transaction_id, "status": "flagged"}
 
 
-def open_dispute(ctx: ToolContext, account_id: str, transaction_id: str, reason: str) -> dict[str, Any]:
+def open_dispute(ctx: ToolContext, account_id: str, transaction_id: str,
+                 reason: str | None = None) -> dict[str, Any]:
     """Open a dispute and return the Regulation E timeline. Write action.
 
     The requirement that the customer explicitly confirmed is enforced by the
     action-policy guardrail (Phase 4), not here.
     """
     _authorize(ctx, account_id)
-    if not reason.strip():
-        raise ToolError("reason must not be empty.")
+    reason = (reason or "").strip() or DEFAULT_REASON
     conn = connect(ctx.db_path)
     try:
         txn = _get_owned_txn(conn, account_id, transaction_id)
@@ -138,7 +158,7 @@ def open_dispute(ctx: ToolContext, account_id: str, transaction_id: str, reason:
             raise ToolError(f"A dispute is already open for {transaction_id}.")
         dispute_id = f"DSP-{uuid.uuid4().hex[:8].upper()}"
         conn.execute("INSERT INTO disputes VALUES (?,?,?,?,?,?)",
-                     (dispute_id, account_id, transaction_id, reason.strip(), "open", ctx.now.isoformat()))
+                     (dispute_id, account_id, transaction_id, reason, "open", ctx.now.isoformat()))
         conn.commit()
     finally:
         conn.close()
@@ -241,22 +261,31 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
             "min_amount": {"type": ["number", "null"], "description": "Only transactions at or above this amount."},
             "limit": {"type": ["integer", "null"], "minimum": 1, "maximum": 50,
                       "description": "How many of the newest matching transactions to return (default 50)."},
+            "transaction_id": {"type": ["string", "null"],
+                               "description": "Exact id like TXN-012345. Use it to check a transaction exists on "
+                                              "this account before acting on it; count 0 means it is not on the account."},
+            "merchant": {"type": ["string", "null"], "description": "Merchant name or part of it, case-insensitive."},
+            "city": {"type": ["string", "null"], "description": "City or part of it, case-insensitive."},
         }, "required": ["account_id"], "additionalProperties": False}}},
     {"type": "function", "function": {
         "name": "flag_unusual_charge",
         "description": "Flag a transaction the customer thinks is unusual.",
         "parameters": {"type": "object", "properties": {
             "account_id": _ACCOUNT, "transaction_id": _TXN,
-            "reason": {"type": "string", "description": "Why it looks unusual."},
-        }, "required": ["account_id", "transaction_id", "reason"], "additionalProperties": False}}},
+            "reason": {"type": ["string", "null"],
+                       "description": "Optional. Infer it from the conversation (e.g. 'customer does not recognise "
+                                      "it'); never ask the customer just to fill this in."},
+        }, "required": ["account_id", "transaction_id"], "additionalProperties": False}}},
     {"type": "function", "function": {
         "name": "open_dispute",
         "description": "Open a dispute for a transaction. Only call after the customer has explicitly "
                        "confirmed in this conversation that they want a dispute opened.",
         "parameters": {"type": "object", "properties": {
             "account_id": _ACCOUNT, "transaction_id": _TXN,
-            "reason": {"type": "string", "description": "The customer's reason for the dispute."},
-        }, "required": ["account_id", "transaction_id", "reason"], "additionalProperties": False}}},
+            "reason": {"type": ["string", "null"],
+                       "description": "Optional. Infer it from the conversation (e.g. 'duplicate charge'); never ask "
+                                      "the customer just to fill this in."},
+        }, "required": ["account_id", "transaction_id"], "additionalProperties": False}}},
     {"type": "function", "function": {
         "name": "search_policy",
         "description": "Search Regulation E policy text. Cite the returned chunk ids in your answer.",

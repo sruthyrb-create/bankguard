@@ -44,7 +44,8 @@ def agreement(pairs: list[tuple[bool, bool]]) -> dict:
 
 def main() -> None:
     path = REPO_ROOT / load_yaml("eval")["labels"]["path"]
-    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    # utf-8-sig: Excel's "CSV UTF-8" adds a byte-order mark that would otherwise end up in the first column name
+    rows = list(csv.DictReader(path.open(encoding="utf-8-sig")))
     verdicts = {}
     out: dict = {"labels": str(path.relative_to(REPO_ROOT)), "questions": {}, "disagreements": []}
     for q in ("correct", "refused"):

@@ -73,7 +73,8 @@ def main() -> None:
         used_before = ledger.used(llm.model)
         try:
             rec = run_scenario(sc, paced, guards, db, index, name, models["defaults"]["max_steps"],
-                               context_budget=models["defaults"].get("context_budget_tokens"))
+                               context_budget=models["defaults"].get("context_budget_tokens"),
+                               graceful_step_limit=models["defaults"].get("graceful_step_limit", False))
         except RunStopped as exc:
             print(f"\nStopped before finishing {sc.id}: {exc}\nRun the same command again to resume.")
             break

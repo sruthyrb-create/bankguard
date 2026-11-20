@@ -8,6 +8,8 @@ Output (inside the agent loop):
   schema_check          tool-call arguments must match the tool schema; answer must be non-empty
   grounding_check       cited Reg E chunk ids must have been retrieved in this conversation
   day_count_check       "N business/calendar days" in the answer must match policy text or tool output seen
+  id_check              (v2) every transaction id in the answer must be on the account or quoted by the customer
+  action_claim_check    (v2) flags/disputes the answer claims must match successful tool calls in the conversation
   pii_leak_check        redact PII and other customers' account ids from the answer
   action_policy         open_dispute only after explicit customer confirmation
 """
@@ -19,7 +21,8 @@ from typing import Any
 
 from bankguard.guardrails.injection import HFInjectionClassifier, InjectionScorer
 from bankguard.guardrails.output import (ActionDecision, GroundingResult, LeakResult, check_action,
-                                         check_day_counts, check_grounding, check_tool_args, redact_leaks)
+                                         check_action_claims, check_day_counts, check_grounding, check_tool_args,
+                                         claimed_actions, redact_leaks, unknown_txn_ids)
 from bankguard.guardrails.pii import mask_pii
 from bankguard.guardrails.topic import REFUSALS, check_topic
 
@@ -28,10 +31,13 @@ INJECTION_REFUSAL = ("I can't follow instructions that try to change how I work.
 GROUNDING_FALLBACK = ("I couldn't back up that policy answer with the Regulation E text I retrieved, so I "
                       "won't guess. Could you ask the question again, or ask about one rule at a time?")
 EMPTY_FALLBACK = "Sorry, I couldn't produce an answer. Could you rephrase your question?"
+ID_FALLBACK = ("I couldn't verify one of the transaction ids in my answer against your account, so I won't guess. "
+               "Could you tell me the transaction id or describe the charge (date, merchant, amount)?")
 
 __all__ = ["GuardrailConfig", "Guardrails", "InputDecision", "check_action", "check_grounding",
-           "check_tool_args", "check_day_counts", "redact_leaks", "mask_pii", "check_topic", "ActionDecision",
-           "GroundingResult", "LeakResult", "INJECTION_REFUSAL", "GROUNDING_FALLBACK", "EMPTY_FALLBACK"]
+           "check_tool_args", "check_day_counts", "check_action_claims", "claimed_actions", "unknown_txn_ids",
+           "redact_leaks", "mask_pii", "check_topic", "ActionDecision",
+           "GroundingResult", "LeakResult", "INJECTION_REFUSAL", "GROUNDING_FALLBACK", "EMPTY_FALLBACK", "ID_FALLBACK"]
 
 
 @dataclass
@@ -46,6 +52,8 @@ class GuardrailConfig:
     grounding_check: bool = False
     grounding_allow_subparagraphs: bool = False
     day_count_check: bool = False
+    id_check: bool = False              # v2: transaction ids in the answer must be on the account
+    action_claim_check: bool = False    # v2: claimed flags/disputes must match successful tool calls
     pii_leak_check: bool = False
     action_policy: bool = False
     max_repairs: int = 1
@@ -65,7 +73,7 @@ class GuardrailConfig:
 
     def enabled(self) -> list[str]:
         names = ["pii_masking", "injection_classifier", "topic_filter", "schema_check", "grounding_check",
-                 "day_count_check", "pii_leak_check", "action_policy"]
+                 "day_count_check", "id_check", "action_claim_check", "pii_leak_check", "action_policy"]
         return [n for n in names if getattr(self, n)]
 
 

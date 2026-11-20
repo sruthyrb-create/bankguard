@@ -81,3 +81,11 @@
 - `check_grounding(..., allow_subparagraphs)`; guardrail setting `grounding_allow_subparagraphs` (default false, unchanged for v1).
 - Judge and labelling sheet read references from every scenario set.
 
+## Phase 5, part 4: agent v2 (2026-11-19)
+- Tools: `get_transactions` filters `transaction_id`, `merchant`, `city`; `reason` optional for `flag_unusual_charge` and `open_dispute`.
+- System prompt v2 (acting on transactions, policy questions, id format examples).
+- Output guardrails `id_check` and `action_claim_check` (configs/guardrails.yaml); `grounding_allow_subparagraphs: true`. Fallback for unrepaired claim errors is a factual summary of completed actions.
+- `max_steps: 8` and `graceful_step_limit: true` (configs/models.yaml): one tool-free call for a real reply when steps run out.
+- `agent_version: v2`. `judge_agreement.py` reads Excel's UTF-8 CSV (byte-order mark).
+- Tests: `tests/test_v2.py` (regression cases are the real v1 replies).
+
