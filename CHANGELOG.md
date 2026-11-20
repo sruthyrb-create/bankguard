@@ -92,3 +92,6 @@
 ## Phase 5, part 4 fix (2026-11-19)
 - Judge requests set `max_tokens: 300`; `PacedLLM` paces output tokens per minute (`otpm`, configs/eval.yaml); `judge_eval.py` stops cleanly on a rate-limit error.
 
+## Phase 5, part 4 fix 2 (2026-11-19)
+- Eval grader compares expected day counts by meaning (`grading.contains`); regression test from heldout-dispute-04. Re-applied to all saved runs with `regrade_eval.py`.
+

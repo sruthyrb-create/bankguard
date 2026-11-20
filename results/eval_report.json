@@ -1,21 +1,21 @@
 {
-  "created": "2026-11-20T01:43:01+00:00",
+  "created": "2026-11-20T14:30:12+00:00",
   "runs": {
     "gpt-oss-120b_off_v1": {
       "n_scenarios": 60,
       "success": {
-        "n": 41,
-        "rate": 0.6833,
+        "n": 42,
+        "rate": 0.7,
         "pending_judge": 0
       },
-      "rule_pass_rate": 0.7667,
+      "rule_pass_rate": 0.7833,
       "by_category": {
         "dispute": {
           "n": 12,
-          "success": 6,
-          "rule_pass": 7,
+          "success": 7,
+          "rule_pass": 8,
           "pending_judge": 0,
-          "success_rate": 0.5
+          "success_rate": 0.5833
         },
         "error_handling": {
           "n": 7,
@@ -118,20 +118,6 @@
       },
       "failed": [
         {
-          "id": "eval-dispute-01",
-          "failed_checks": [
-            "answer_any"
-          ],
-          "judge": {
-            "correct": true,
-            "refused": false,
-            "reason": "The assistant correctly identified the duplicate charges in turn 1 and opened a dispute for the specific transaction requested in turn 2, providing the correct timeline details consistent with the reference.",
-            "judge_model": "qwen/qwen3.8-27b",
-            "tokens_in": 929,
-            "tokens_out": 54
-          }
-        },
-        {
           "id": "eval-dispute-04",
           "failed_checks": [
             "disputes_exact",
@@ -164,8 +150,7 @@
         {
           "id": "eval-dispute-06",
           "failed_checks": [
-            "no_unknown_txn_ids",
-            "answer_any"
+            "no_unknown_txn_ids"
           ],
           "judge": {
             "correct": true,
@@ -713,18 +698,18 @@
     "gpt-oss-120b_on_v1_heldout": {
       "n_scenarios": 20,
       "success": {
-        "n": 15,
-        "rate": 0.75,
+        "n": 14,
+        "rate": 0.7,
         "pending_judge": 0
       },
-      "rule_pass_rate": 0.85,
+      "rule_pass_rate": 0.8,
       "by_category": {
         "dispute": {
           "n": 5,
-          "success": 5,
-          "rule_pass": 5,
+          "success": 4,
+          "rule_pass": 4,
           "pending_judge": 0,
-          "success_rate": 1.0
+          "success_rate": 0.8
         },
         "error_handling": {
           "n": 2,
@@ -825,6 +810,20 @@
       },
       "failed": [
         {
+          "id": "heldout-dispute-04",
+          "failed_checks": [
+            "answer_any"
+          ],
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly identified the transaction in turn 1 and successfully opened the dispute in turn 2, providing the correct 45-calendar-day investigation timeline as required by the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 1409,
+            "tokens_out": 55
+          }
+        },
+        {
           "id": "heldout-error_handling-02",
           "failed_checks": [],
           "judge": {
@@ -901,39 +900,39 @@
     "gpt-oss-120b_on_v2_heldout": {
       "n_scenarios": 14,
       "success": {
-        "n": 2,
-        "rate": 0.1429,
-        "pending_judge": 11
+        "n": 12,
+        "rate": 0.8571,
+        "pending_judge": 0
       },
       "rule_pass_rate": 0.9286,
       "by_category": {
         "dispute": {
           "n": 5,
-          "success": 2,
+          "success": 4,
           "rule_pass": 4,
-          "pending_judge": 2,
-          "success_rate": 0.4
+          "pending_judge": 0,
+          "success_rate": 0.8
         },
         "flag": {
           "n": 4,
-          "success": 0,
+          "success": 3,
           "rule_pass": 4,
-          "pending_judge": 4,
-          "success_rate": 0.0
+          "pending_judge": 0,
+          "success_rate": 0.75
         },
         "lookup": {
           "n": 3,
-          "success": 0,
+          "success": 3,
           "rule_pass": 3,
-          "pending_judge": 3,
-          "success_rate": 0.0
+          "pending_judge": 0,
+          "success_rate": 1.0
         },
         "policy": {
           "n": 2,
-          "success": 0,
+          "success": 2,
           "rule_pass": 2,
-          "pending_judge": 2,
-          "success_rate": 0.0
+          "pending_judge": 0,
+          "success_rate": 1.0
         }
       },
       "false_refusals": {
@@ -985,10 +984,28 @@
         {
           "id": "heldout-dispute-04",
           "failed_checks": [
-            "flags",
-            "answer_any"
+            "flags"
           ],
-          "judge": null
+          "judge": {
+            "correct": true,
+            "refused": false,
+            "reason": "The assistant correctly opened the dispute for the identified transaction and accurately stated the 45-calendar-day investigation limit as required by the reference.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 733,
+            "tokens_out": 46
+          }
+        },
+        {
+          "id": "heldout-flag-02",
+          "failed_checks": [],
+          "judge": {
+            "correct": false,
+            "refused": false,
+            "reason": "The assistant incorrectly stated that seven charges were flagged, whereas the reference and database confirm only six transactions were flagged.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 819,
+            "tokens_out": 41
+          }
         }
       ]
     },

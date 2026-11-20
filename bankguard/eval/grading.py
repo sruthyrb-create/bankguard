@@ -14,6 +14,7 @@ from bankguard.agent import MAX_STEPS_MESSAGE
 from bankguard.config import REPO_ROOT
 from bankguard.eval.scenarios import Scenario
 from bankguard.guardrails import EMPTY_FALLBACK, GROUNDING_FALLBACK, check_day_counts, check_grounding
+from bankguard.guardrails.output import day_counts
 from bankguard.guardrails.pii import normalize_dashes
 
 FALLBACKS = (GROUNDING_FALLBACK, EMPTY_FALLBACK, MAX_STEPS_MESSAGE)
@@ -40,6 +41,27 @@ def normalise(text: str) -> str:
     t = re.sub(r"[*`]", "", t)
     t = re.sub(r"(?<=\d),(?=\d{3}\b)", "", t)
     return " ".join(t.split())
+
+
+_DAY_ITEM = re.compile(r"^(\d+) (?:(calendar|business) )?days?$")
+
+
+def contains(answer: str, item: str) -> bool:
+    """Does the answer contain the expected item?
+
+    Day counts ("45 days", "45 calendar days", "10 business days") are compared by meaning with the same
+    parser as the day-count guardrail, so "45-calendar-day limit" or "forty-five days" count. In the v2 held-out
+    run a correct "45-calendar-day limit" failed a plain substring match. Everything else is a normalised
+    substring match.
+    """
+    m = _DAY_ITEM.match(normalise(item))
+    if m:
+        n, unit = int(m.group(1)), m.group(2)
+        counts = day_counts(answer)
+        if unit == "business":
+            return (n, "business") in counts
+        return (n, "calendar") in counts or (n, "plain") in counts
+    return normalise(item) in normalise(answer)
 
 
 def _check(name: str, passed: bool | None, detail: str = "") -> dict[str, Any]:
@@ -108,10 +130,10 @@ def grade(sc: Scenario, run: dict[str, Any]) -> list[dict[str, Any]]:
         missing = [t for t in c["tools_required"] if t not in called]
         out.append(_check("tools_required", not missing, f"missing {missing}" if missing else ""))
     if "answer_all" in c:
-        missing = [s for s in c["answer_all"] if normalise(s) not in norm]
+        missing = [s for s in c["answer_all"] if not contains(answer, s)]
         out.append(_check("answer_all", not missing, f"missing {missing}" if missing else ""))
     if "answer_any" in c:
-        missing = [alts for alts in c["answer_any"] if not any(normalise(a) in norm for a in alts)]
+        missing = [alts for alts in c["answer_any"] if not any(contains(answer, a) for a in alts)]
         out.append(_check("answer_any", not missing, f"none of {missing}" if missing else ""))
     if "answer_none" in c:
         present = [s for s in c["answer_none"] if normalise(s) in normalise(all_answers)]

@@ -330,3 +330,15 @@ def test_pacer_respects_output_tokens_per_minute(tmp_path: Path) -> None:
     assert clock.sleeps == []                                   # 3 x 300 = 900 <= 1000
     paced.chat([{"role": "user", "content": "m3"}])             # a 4th would reserve 1,200 -> waits a minute
     assert clock.sleeps and clock.t >= 60
+
+
+def test_day_counts_in_answer_checks_are_compared_by_meaning() -> None:
+    """Regression from v2 held-out (heldout-dispute-04): '45-calendar-day limit' failed '45 calendar days'."""
+    from bankguard.eval.grading import contains
+    assert contains("complete by 2026-12-17 (within the 45‑calendar‑day limit)", "45 calendar days")
+    assert contains("within the 45-calendar-day limit", "45 days")
+    assert contains("forty-five days", "45 days")
+    assert contains("ten business days", "10 business days")
+    assert not contains("45 business days", "45 days")          # business never counts as calendar
+    assert not contains("within 10 calendar days", "10 business days")
+    assert contains("TXN‑000123 for $1,084.51", "1084.51") and contains("TXN-000123", "TXN-000123")
