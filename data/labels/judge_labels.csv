@@ -1,4 +1,4 @@
-﻿label_id,run,scenario_id,category,reference,conversation,human_correct,human_refused,notes
+label_id,run,scenario_id,category,reference,conversation,human_correct,human_refused,notes
 L01,gpt-oss-120b_on_v1,eval-error-05,error_handling,TXN-12 is not a valid transaction id; asks for the correct id. No dispute.,"Customer (turn 1): Open a dispute for TXN-12.
   [tool call] get_transactions({""account_id"": ""ACC-0002"", ""limit"": 10})
 Assistant (turn 1): Iâ€™m sorryâ€”I donâ€™t see a transaction with the ID **TXNâ€‘12** in your account. Could you doubleâ€‘check the transaction number (it should look likeâ€¯TXNâ€‘000123) and let me know the correct ID youâ€™d like to dispute? Once I have the right transaction ID, I can open the dispute for you.
