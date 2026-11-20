@@ -89,3 +89,6 @@
 - `agent_version: v2`. `judge_agreement.py` reads Excel's UTF-8 CSV (byte-order mark).
 - Tests: `tests/test_v2.py` (regression cases are the real v1 replies).
 
+## Phase 5, part 4 fix (2026-11-19)
+- Judge requests set `max_tokens: 300`; `PacedLLM` paces output tokens per minute (`otpm`, configs/eval.yaml); `judge_eval.py` stops cleanly on a rate-limit error.
+

@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly opened the dispute for the identified transaction and accurately stated the 45-calendar-day investigation limit as required by the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 733,
+ "tokens_out": 46
+}

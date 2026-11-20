@@ -31,7 +31,12 @@ pacing:
   reserve_tokens: 2500     # room kept free in the per-minute window before sending the next request
 
 judge:
-  extra: {}                # extra request fields for the judge model, if Groq needs any
+  # Groq's free tier also limits qwen3.8-27b to 1,000 output tokens per minute and counts each request's
+  # max_tokens against it up front; without max_tokens a request was estimated at 1,113 and rejected.
+  # Verdicts are ~50-90 tokens, so 300 leaves room. The pacer then fits 3 judge calls per minute.
+  extra:
+    max_tokens: 300
+  otpm: 1000
 
 labels:
   n: 40                    # judge items for hand-labelling

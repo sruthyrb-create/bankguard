@@ -318,3 +318,15 @@ def test_pacer_makes_room_for_the_request_itself(tmp_path: Path) -> None:
     big = [{"role": "user", "content": "x" * 18000}]           # ~6000 estimated: 3000 + 6000 > 8000 -> wait
     paced.chat(big)
     assert clock.sleeps and clock.t >= 60
+
+
+def test_pacer_respects_output_tokens_per_minute(tmp_path: Path) -> None:
+    clock = Clock()
+    paced = PacedLLM(CountingLLM(tokens_in=100, out=50), tpm=10**6, rpm=1000, daily_budget=10**6,
+                     reserve_tokens=10, ledger=UsageLedger(tmp_path / "u.json"), clock=clock.now, sleep=clock.sleep,
+                     otpm=1000, max_output_tokens=300)
+    for i in range(3):
+        paced.chat([{"role": "user", "content": f"m{i}"}])
+    assert clock.sleeps == []                                   # 3 x 300 = 900 <= 1000
+    paced.chat([{"role": "user", "content": "m3"}])             # a 4th would reserve 1,200 -> waits a minute
+    assert clock.sleeps and clock.t >= 60

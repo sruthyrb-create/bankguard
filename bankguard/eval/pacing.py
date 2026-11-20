@@ -61,17 +61,24 @@ class PacedLLM:
 
     def __init__(self, llm: Any, tpm: int, rpm: int, daily_budget: int, reserve_tokens: int = 2500,
                  ledger: UsageLedger | None = None, clock: Callable[[], float] = time.monotonic,
-                 sleep: Callable[[float], None] = time.sleep) -> None:
+                 sleep: Callable[[float], None] = time.sleep, otpm: int | None = None,
+                 max_output_tokens: int | None = None) -> None:
         self.llm, self.model = llm, llm.model
         self.tpm, self.rpm, self.daily_budget, self.reserve = tpm, rpm, daily_budget, reserve_tokens
         self.ledger = ledger or UsageLedger()
         self.clock, self.sleep = clock, sleep
         self.window: deque[tuple[float, int]] = deque()  # (time, counted tokens) of API calls in the last minute
+        # Output tokens per minute (Groq limits qwen3.8-27b to 1,000 on the free tier and counts each request's
+        # max_tokens up front), so each call reserves max_output_tokens in its own one-minute window.
+        self.otpm, self.max_output_tokens = otpm, max_output_tokens
+        self.out_window: deque[tuple[float, int]] = deque()
         self.waited_s = 0.0
 
     def _trim(self, now: float) -> None:
         while self.window and now - self.window[0][0] >= 60:
             self.window.popleft()
+        while self.out_window and now - self.out_window[0][0] >= 60:
+            self.out_window.popleft()
 
     def _wait_for_room(self, need: int) -> None:
         """Wait until the last minute's counted tokens plus this request fit under the per-minute limit."""
@@ -80,9 +87,13 @@ class PacedLLM:
             now = self.clock()
             self._trim(now)
             tokens = sum(t for _, t in self.window)
-            if tokens + need <= self.tpm and len(self.window) < self.rpm:
+            out_ok = (self.otpm is None or not self.max_output_tokens
+                      or sum(t for _, t in self.out_window) + self.max_output_tokens <= self.otpm)
+            if tokens + need <= self.tpm and len(self.window) < self.rpm and out_ok:
                 return
-            wait = max(0.5, 60 - (now - self.window[0][0])) if self.window else 0.5
+            oldest = min([w[0] for w in (self.window[0] if self.window else None,
+                                         self.out_window[0] if self.out_window else None) if w] or [now])
+            wait = max(0.5, 60 - (now - oldest))
             self.waited_s += wait
             self.sleep(wait)
 
@@ -96,5 +107,7 @@ class PacedLLM:
         resp = self.llm.chat(messages, tools)
         n = counted_tokens(resp)
         self.window.append((self.clock(), n))
+        if self.max_output_tokens:
+            self.out_window.append((self.clock(), self.max_output_tokens))
         self.ledger.add(self.model, n)
         return resp

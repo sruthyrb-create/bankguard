@@ -18,6 +18,7 @@ from bankguard.eval.pacing import BudgetExhausted, PacedLLM, UsageLedger  # noqa
 from bankguard.eval.runner import load_records  # noqa: E402
 from bankguard.eval.scenarios import all_references  # noqa: E402
 from bankguard.llm import make_llm  # noqa: E402
+from openai import RateLimitError  # noqa: E402
 
 JUDGE_DIR = REPO_ROOT / "results" / "eval" / "judge"
 
@@ -45,12 +46,14 @@ def main() -> None:
     print(f"Judging {len(todo)} of {len(records)} records of {args.run}")
     llm = make_llm("groq", models["groq"]["judge_model"], extra=cfg["judge"].get("extra") or {})
     ft, pc = cfg["free_tier"], cfg["pacing"]
-    paced = PacedLLM(llm, ft["tpm"], ft["rpm"], pc["daily_budget"], pc["reserve_tokens"], UsageLedger())
+    jc = cfg["judge"]
+    paced = PacedLLM(llm, ft["tpm"], ft["rpm"], pc["daily_budget"], pc["reserve_tokens"], UsageLedger(),
+                     otpm=jc.get("otpm"), max_output_tokens=(jc.get("extra") or {}).get("max_tokens"))
     for r in todo:
         try:
             resp = paced.chat(judge_messages(r, refs[r["scenario_id"]]))
-        except BudgetExhausted as exc:
-            print(f"Stopped: {exc}. Run again to resume.")
+        except (BudgetExhausted, RateLimitError) as exc:
+            print(f"Stopped: {str(exc)[:200]}. Run again to resume (verdicts so far are saved).")
             break
         try:
             verdict = parse_verdict(resp.content)

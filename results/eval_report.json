@@ -1,5 +1,5 @@
 {
-  "created": "2026-11-20T00:22:52+00:00",
+  "created": "2026-11-20T01:43:01+00:00",
   "runs": {
     "gpt-oss-120b_off_v1": {
       "n_scenarios": 60,
@@ -895,6 +895,100 @@
             "tokens_in": 624,
             "tokens_out": 63
           }
+        }
+      ]
+    },
+    "gpt-oss-120b_on_v2_heldout": {
+      "n_scenarios": 14,
+      "success": {
+        "n": 2,
+        "rate": 0.1429,
+        "pending_judge": 11
+      },
+      "rule_pass_rate": 0.9286,
+      "by_category": {
+        "dispute": {
+          "n": 5,
+          "success": 2,
+          "rule_pass": 4,
+          "pending_judge": 2,
+          "success_rate": 0.4
+        },
+        "flag": {
+          "n": 4,
+          "success": 0,
+          "rule_pass": 4,
+          "pending_judge": 4,
+          "success_rate": 0.0
+        },
+        "lookup": {
+          "n": 3,
+          "success": 0,
+          "rule_pass": 3,
+          "pending_judge": 3,
+          "success_rate": 0.0
+        },
+        "policy": {
+          "n": 2,
+          "success": 0,
+          "rule_pass": 2,
+          "pending_judge": 2,
+          "success_rate": 0.0
+        }
+      },
+      "false_refusals": {
+        "n": 0,
+        "of": 14,
+        "rate": 0.0,
+        "ids": [],
+        "by_kind": {},
+        "detail": []
+      },
+      "correct_refusals": {
+        "n": 0,
+        "of": 0,
+        "rate": null
+      },
+      "tool_accuracy": 0.9286,
+      "invalid_tool_calls": {
+        "n": 0,
+        "of": 27,
+        "rate": 0.0
+      },
+      "grounded_policy_answers": {
+        "n": 2,
+        "of": 2,
+        "rate": 1.0
+      },
+      "day_count_errors": {
+        "n": 0,
+        "ids": []
+      },
+      "guardrail_events": {},
+      "cost": {
+        "llm_calls": 44,
+        "api_calls": 44,
+        "tokens_in": 65019,
+        "tokens_out": 6251,
+        "provider_cached_tokens": 1024,
+        "tokens_per_scenario_mean": 5091
+      },
+      "latency_ms": {
+        "turns_with_api_calls": 17,
+        "turns_measured": 17,
+        "turn_llm_p50": 1641,
+        "turn_llm_p95": 33240,
+        "turns_with_retries": 0,
+        "server_ms_mean": 956
+      },
+      "failed": [
+        {
+          "id": "heldout-dispute-04",
+          "failed_checks": [
+            "flags",
+            "answer_any"
+          ],
+          "judge": null
         }
       ]
     },

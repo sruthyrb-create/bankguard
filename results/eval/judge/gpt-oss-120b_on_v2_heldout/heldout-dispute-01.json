@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identified the transactions, opened a dispute for the specific transaction requested (TXN-041977), and provided the correct provisional credit date and investigation timeline consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 754,
+ "tokens_out": 65
+}

@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly opened the dispute, provided the correct provisional credit date (2026-11-16), and accurately stated the 90-day investigation window for a non-US transaction, consistent with the reference and database changes.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 596,
+ "tokens_out": 68
+}
