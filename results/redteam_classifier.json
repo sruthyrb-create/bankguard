@@ -1,5 +1,5 @@
 {
-  "created": "2026-11-22T20:35:15+00:00",
+  "created": "2026-11-22T21:02:05+00:00",
   "classifier": "protectai/deberta-v3-base-prompt-injection-v2@main",
   "threshold": 0.9999993443489075,
   "attacks_typed_in_chat": {

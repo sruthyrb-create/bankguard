@@ -1,0 +1,125 @@
+{
+ "scenario_id": "eval-policy-02",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:23:19+00:00",
+ "turns": [
+  {
+   "user": "When can the bank take 90 days instead of 45 to investigate?",
+   "answer": "Under Regulation E, the standard investigation period is 45 days after the bank receives a notice of error. The bank may extend that period to **90 days** (instead of 45 days) when the notice of error involves an electronic fund transfer that meets any of the following conditions:\n\n1. The transfer **was not initiated within a state** (i.e., it was an out‑of‑state transaction);  \n2. The transfer **resulted from a point‑of‑sale debit‑card transaction**; or  \n3. The transfer **occurred within 30 days after the first deposit to the account was made**.  \n\nIn those situations, the bank is allowed up to 90 days to complete its investigation and determine whether an error occurred【1005.11(c)#3】.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E 90 days investigation period 45 days extension"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 3659,
+   "tokens_out": 430,
+   "latency_ms": 61249,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1026,
+    "llm_ms": 2130,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.13(b)#1",
+  "1005.15(e)#2"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#3'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": true
+}

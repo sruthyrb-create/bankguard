@@ -1,0 +1,131 @@
+{
+ "scenario_id": "eval-policy-01",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:22:18+00:00",
+ "turns": [
+  {
+   "user": "How long does the bank have to investigate an error I report?",
+   "answer": "Under Regulation E the bank must investigate a reported error promptly:\n\n* **Initial investigation period** – The institution must determine whether an error occurred within **10 business days** of receiving your notice. It must then report the results within three business days and correct any error within one business day after the determination【1005.11(c)#1】.  \n\n* **Extended investigation period** – If the investigation cannot be completed within those 10 business days, the bank may take up to **45 days** (calendar days) from receipt of the notice to finish the investigation, provided it gives you a provisional credit within the first 10 business days【1005.11(c)#1】.  \n\n* **Special extensions** – For certain types of transfers (e.g., point‑of‑sale debit card transactions, out‑of‑state transfers, or errors occurring within 30 days of the first deposit), the investigation period can be extended to **90 days** (calendar days) instead of 45 days【1005.11(c)#3】.  \n\n* **Further business‑day extension** – The initial 10‑business‑day period can be lengthened to **20 business days** in limited circumstances described in the regulation【1005.11(c)#3】.  \n\nSo, normally the bank has **10 business days** to investigate, with possible extensions to **45 calendar days** (or up to **90 calendar days** for specific situations) and a possible **20 business‑day** extension in certain cases.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "investigation timeline error report Regulation E how many days bank must investigate"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 6296,
+   "tokens_out": 1007,
+   "latency_ms": 62500,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "repair",
+     "detail": "unsupported day counts: ['45 business days', '90 business days']",
+     "rejected": "Under Regulation E the bank must investigate a reported error promptly:\n\n* **Standard timeline** – The institution must determine whether an error occurred within **10 business days** of receiving your notice. It must then report the results within three business days and correct any error within one business day after the determination【1005.11(c)#1】.  \n\n* **Extended timeline** – If the investigation cannot be completed within those 10 business days, the bank may take up to **45 business days** from receipt of the notice to finish the investigation, provided it gives you a provisional credit within the first 10 business days【1005.11(c)#1】.  \n\n* **Special extensions** – In certain situations (e.g., the error involves a point‑of‑sale debit card transaction, an out‑of‑state transfer, or occur"
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 3,
+    "retries": 0,
+    "server_ms": 2497,
+    "llm_ms": 3634,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.15(e)#4",
+  "1005.18(e)#2"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#1', '1005.11(c)#1', '1005.11(c)#3', '1005.11(c)#3'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": true
+}

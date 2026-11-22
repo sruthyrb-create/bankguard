@@ -1,0 +1,105 @@
+{
+ "scenario_id": "eval-flag-06",
+ "category": "flag",
+ "account": "ACC-0044",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:08:04+00:00",
+ "turns": [
+  {
+   "user": "Flag the Reykjavik charge please.",
+   "answer": "I see two recent charges from Reykjavík on your account:\n\n| Transaction ID | Date & Time (local) | Merchant | Amount |\n|---|---|---|---|\n| TXN-040761 | 2026‑09‑17 09:51 | CloudBox Storage | $7.33 |\n| TXN-041738 | 2026‑08‑08 09:27 | Harbor Grill | $32.74 |\n\nWhich one would you like me to flag as unusual? Please provide the transaction ID.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0044",
+      "city": "Reykjavik",
+      "limit": 5
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2471,
+   "tokens_out": 292,
+   "latency_ms": 2324,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 728,
+    "llm_ms": 1750,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": false,
+   "detail": "required ['TXN-040761'], allowed ['TXN-040761'], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  }
+ ],
+ "rule_pass": false
+}

@@ -1,0 +1,133 @@
+{
+ "scenario_id": "eval-dispute-12",
+ "category": "dispute",
+ "account": "ACC-0239",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:21:16+00:00",
+ "turns": [
+  {
+   "user": "There's a $155.63 Bluebird Coffee charge. Is that right?",
+   "answer": "Yes, your account shows a charge of **$155.63** from **Bluebird Coffee** on **2026‑08‑24** (online purchase, North Brendatown, KS). Let me know if you’d like to flag this charge or open a dispute.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0239",
+      "limit": 10,
+      "merchant": "Bluebird Coffee",
+      "min_amount": 155.63
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2454,
+   "tokens_out": 269,
+   "latency_ms": 59971,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 733,
+    "llm_ms": 1827,
+    "context_trims": 0
+   }
+  },
+  {
+   "user": "Oh wait, that was my catering order. Never mind, no dispute needed.",
+   "answer": "Got it—no further action will be taken on that charge. If you need anything else, just let me know.",
+   "tool_calls": [],
+   "llm_calls": 1,
+   "tokens_in": 1377,
+   "tokens_out": 51,
+   "latency_ms": 514,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 1,
+    "retries": 0,
+    "server_ms": 163,
+    "llm_ms": 427,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  }
+ ],
+ "rule_pass": true
+}

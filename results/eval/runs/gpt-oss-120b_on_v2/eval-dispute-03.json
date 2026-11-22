@@ -1,0 +1,120 @@
+{
+ "scenario_id": "eval-dispute-03",
+ "category": "dispute",
+ "account": "ACC-0311",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:11:07+00:00",
+ "turns": [
+  {
+   "user": "Please open a dispute for TXN-040747. I never bought anything at Northside Pharmacy for $1,084.51.",
+   "answer": "Your dispute for **TXN-040747** (Northside Pharmacy, $1,084.51) has been opened successfully.\n\n**Dispute details**\n- **Dispute ID:** DSP-0ECDC600  \n- **Amount:** $1,084.51  \n- **Status:** Open  \n\n**Timeline (Regulation E)**  \n- **Provisional credit** will be posted by **2026‑11‑16** (within 10 business days).  \n- The investigation must be completed by **2026‑12‑17** (45 calendar days).  \n\nIf you have any further questions about this dispute or need additional assistance, just let me know.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0311",
+      "transaction_id": "TXN-040747"
+     },
+     "error": null
+    },
+    {
+     "tool": "open_dispute",
+     "args": {
+      "account_id": "ACC-0311",
+      "reason": "Customer does not recognise charge",
+      "transaction_id": "TXN-040747"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 3959,
+   "tokens_out": 303,
+   "latency_ms": 59295,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 3,
+    "retries": 0,
+    "server_ms": 860,
+    "llm_ms": 2193,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [
+  "TXN-040747"
+ ],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected ['TXN-040747'], got ['TXN-040747']"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  }
+ ],
+ "rule_pass": true
+}

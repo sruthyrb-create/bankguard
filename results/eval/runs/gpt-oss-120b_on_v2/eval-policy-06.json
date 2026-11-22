@@ -1,0 +1,135 @@
+{
+ "scenario_id": "eval-policy-06",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:27:25+00:00",
+ "turns": [
+  {
+   "user": "What if I wait a week before reporting my lost debit card?",
+   "answer": "If you wait a week (seven days) after you discover that your debit card is lost or stolen before you tell us, you will be outside the notice windows required by Regulation E.\n\n* **Standard liability rule** – Under § 1005.6(b) you must give notice **within two business days** after you learn of the loss or theft. If you do so, your liability is limited to the lesser of $50 or the amount of any unauthorized transfers that occur before you give notice. If you **do not** give notice within two business days, your liability can rise to the lesser of $500 or the sum of:  \n  1. $50 (or the amount of unauthorized transfers that occur in the first two business days), and  \n  2. any unauthorized transfers that happen after those two days but before you finally notify us【1005.6(b)#1】.\n\n* **Extended notice period** – Some service‑provider agreements may extend the notice window to **four business days** after you learn of the loss or theft【1005.14(b)#2】. Even that longer window is still far shorter than a full week.\n\nBecause a week exceeds both the two‑business‑day standard and the possible four‑business‑day extension, your liability could be up to **$500** (or the amount of unauthorized transfers, whichever is less). The sooner you report a lost or stolen debit card, the lower your potential exposure. If you suspect any unauthorized activity on your account, please let us know right away so we can investigate and protect you.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "lost debit card reporting timeframe Regulation E"
+     },
+     "error": null
+    },
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "liability unauthorized debit card loss notice two business days Regulation E"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 6514,
+   "tokens_out": 774,
+   "latency_ms": 61657,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 1024,
+    "api_calls": 3,
+    "retries": 0,
+    "server_ms": 1844,
+    "llm_ms": 3202,
+    "context_trims": 1
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.14(b)#1",
+  "1005.14(b)#2",
+  "1005.15(e)#2",
+  "1005.15(e)#3",
+  "1005.6(b)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.6(b)#1', '1005.14(b)#2'], unsupported [], prefixes ['1005.6']"
+  }
+ ],
+ "rule_pass": true
+}

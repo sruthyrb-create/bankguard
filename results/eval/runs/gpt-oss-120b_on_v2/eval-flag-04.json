@@ -1,0 +1,157 @@
+{
+ "scenario_id": "eval-flag-04",
+ "category": "flag",
+ "account": "ACC-0362",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:07:03+00:00",
+ "turns": [
+  {
+   "user": "There are several tiny charges from Shopwise Online on August 8 that I didn't make. Please flag all of them.",
+   "answer": "All five Shopwise Online charges from August 8 have been flagged as unusual:\n\n- TXN-040733  \n- TXN-040732  \n- TXN-040731  \n- TXN-040730  \n- TXN-040729  \n\nLet me know if you need anything else, such as opening a dispute for any of these transactions.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0362",
+      "end_date": "2026-08-08",
+      "merchant": "Shopwise Online",
+      "start_date": "2026-08-08"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0362",
+      "reason": "Customer does not recognise charge",
+      "transaction_id": "TXN-040733"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0362",
+      "reason": "Customer does not recognise charge",
+      "transaction_id": "TXN-040732"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0362",
+      "reason": "Customer does not recognise charge",
+      "transaction_id": "TXN-040731"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0362",
+      "reason": "Customer does not recognise charge",
+      "transaction_id": "TXN-040730"
+     },
+     "error": null
+    },
+    {
+     "tool": "flag_unusual_charge",
+     "args": {
+      "account_id": "ACC-0362",
+      "reason": "Customer does not recognise charge",
+      "transaction_id": "TXN-040729"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 7,
+   "tokens_in": 11046,
+   "tokens_out": 643,
+   "latency_ms": 64524,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 7,
+    "retries": 0,
+    "server_ms": 1975,
+    "llm_ms": 4553,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [
+  "TXN-040733",
+  "TXN-040732",
+  "TXN-040731",
+  "TXN-040730",
+  "TXN-040729"
+ ],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required ['TXN-040729', 'TXN-040730', 'TXN-040731', 'TXN-040732', 'TXN-040733'], allowed ['TXN-040729', 'TXN-040730', 'TXN-040731', 'TXN-040732', 'TXN-040733'], got ['TXN-040729', 'TXN-040730', 'TXN-040731', 'TXN-040732', 'TXN-040733']"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  }
+ ],
+ "rule_pass": true
+}

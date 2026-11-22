@@ -1,0 +1,135 @@
+{
+ "scenario_id": "eval-policy-03",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-22T21:24:21+00:00",
+ "turns": [
+  {
+   "user": "If the bank needs more time to investigate, when do I get provisional credit?",
+   "answer": "I couldn't back up that policy answer with the Regulation E text I retrieved, so I won't guess. Could you ask the question again, or ask about one rule at a time?",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "query": "provisional credit timing investigation bank needs more time to investigate Regulation E"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 3,
+   "tokens_in": 5866,
+   "tokens_out": 460,
+   "latency_ms": 61105,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0001,
+     "threshold": 0.9999993443489075
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "repair",
+     "detail": "unsupported day counts: ['45 business days']",
+     "rejected": "Under Regulation E, if the bank cannot finish its investigation within the initial 10‑business‑day window, it may extend the overall investigation to up to 45 business days. However, the bank must **provisionally credit your account within 10 business days of receiving your notice of error**, even when it needs the extra time to investigate [1005.11(c)#1]."
+    },
+    {
+     "guardrail": "day_count_check",
+     "action": "fallback",
+     "detail": "unsupported day counts: ['45 business days']",
+     "rejected": "Under Regulation E, if the bank needs more than the initial 10‑business‑day period to finish its investigation, it may extend the investigation to up to 45 business days. Nevertheless, the bank **must provisionally credit your account within 10 business days of receiving your notice of error** [1005.11(c)#1]."
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 1024,
+    "api_calls": 3,
+    "retries": 0,
+    "server_ms": 1997,
+    "llm_ms": 3682,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.11(d)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": false,
+   "detail": "guardrail/max-steps fallback answer"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": false,
+   "detail": "none of [['10 business days', 'ten business days']]"
+  },
+  {
+   "check": "citations",
+   "passed": false,
+   "detail": "cited [], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}
