@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly states that the bank must provide a written explanation of its findings and notice of the right to request documents, which aligns perfectly with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 586,
+ "tokens_out": 51
+}

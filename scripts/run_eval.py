@@ -4,6 +4,7 @@
   python scripts/run_eval.py --guardrails on              # all 60 (skips finished ones; resumable)
   python scripts/run_eval.py --guardrails off             # same scenarios, every guardrail off
   python scripts/run_eval.py --guardrails on --set heldout   # the 20 held-out scenarios
+  python scripts/run_eval.py --guardrails on --set redteam_benign   # Phase 6: 20 benign look-alikes
   options: --ids eval-policy-01 eval-policy-02   --force (re-run finished ones)
 
 Stops cleanly when the daily token budget in configs/eval.yaml is reached or Groq
@@ -22,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from bankguard.config import REPO_ROOT, load_yaml  # noqa: E402
 from bankguard.eval.pacing import PacedLLM, UsageLedger  # noqa: E402
 from bankguard.eval.runner import RunStopped, record_path, run_scenario, save_record  # noqa: E402
-from bankguard.eval.scenarios import load_scenarios  # noqa: E402
+from bankguard.eval.scenarios import SETS, load_scenarios  # noqa: E402
 from bankguard.guardrails import GuardrailConfig, Guardrails  # noqa: E402
 from bankguard.llm import make_llm  # noqa: E402
 
@@ -36,7 +37,7 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--guardrails", choices=["on", "off"], required=True)
     p.add_argument("--pilot", action="store_true")
-    p.add_argument("--set", default="main", choices=["main", "heldout"], dest="scenario_set")
+    p.add_argument("--set", default="main", choices=list(SETS), dest="scenario_set")
     p.add_argument("--ids", nargs="*")
     p.add_argument("--force", action="store_true", help="re-run scenarios that already have a record")
     p.add_argument("--backend", default="groq")

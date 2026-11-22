@@ -28,7 +28,9 @@ from bankguard.config import REPO_ROOT
 
 EVAL_DIR = REPO_ROOT / "data" / "scenarios" / "eval"
 HELDOUT_DIR = REPO_ROOT / "data" / "scenarios" / "heldout"
-SETS = {"main": EVAL_DIR, "heldout": HELDOUT_DIR}
+# Phase 6: benign messages that look like attacks, run as ordinary scenarios to measure false refusals.
+REDTEAM_BENIGN_DIR = REPO_ROOT / "data" / "scenarios" / "redteam_benign"
+SETS = {"main": EVAL_DIR, "heldout": HELDOUT_DIR, "redteam_benign": REDTEAM_BENIGN_DIR}
 CATEGORIES = ("lookup", "flag", "dispute", "policy", "refusal", "error_handling")
 CHECK_KEYS = {"tools_required", "answer_all", "answer_any", "answer_none", "citations", "disputes",
               "flags_required", "flags_allowed", "clarify"}
@@ -64,8 +66,8 @@ class Scenario:
 
 
 def load_scenarios(path: Path | None = None, scenario_set: str = "main") -> list[Scenario]:
-    """Load every *.jsonl of a scenario set (main = data/scenarios/eval, heldout = data/scenarios/heldout),
-    or one file."""
+    """Load every *.jsonl of a scenario set (main = data/scenarios/eval, heldout = data/scenarios/heldout,
+    redteam_benign = data/scenarios/redteam_benign), or one file."""
     paths = [path] if path else sorted(SETS[scenario_set].glob("*.jsonl"))
     out: list[Scenario] = []
     for p in paths:

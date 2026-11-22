@@ -42,3 +42,10 @@ labels:
   n: 40                    # judge items for hand-labelling
   seed: 42
   path: data/labels/judge_labels.csv
+
+redteam:
+  # Phase 6. Both sets were written and frozen before the first red-team run; a test fails if either file
+  # changes. Nothing is tuned on them (see DECISIONS.md, 2026-11-21). Changing a set means a new file (v2),
+  # a new hash here, and a note in DECISIONS.md.
+  attacks_sha256: b316a61a423707325293719c10ea35afbfad76e7e6ba3b06d83a268faae61c59   # data/scenarios/redteam/redteam_v1.jsonl
+  benign_sha256: 54423e33ac512bce715fe675dfbafc34cbbe8c3d351bc48f23923680384694e4    # data/scenarios/redteam_benign/benign_v1.jsonl

@@ -98,3 +98,11 @@
 
 ## Phase 5, part 4 fix 3 (2026-11-20)
 - `grading.contains` parses day counts from the normalised answer, so markdown emphasis no longer hides them (fix 2 regressed v1 held-out heldout-dispute-04). Test added.
+
+## Phase 6 set-up (2026-11-21)
+- Red-team sets, frozen by SHA-256 in `configs/eval.yaml`: 40 attacks (`data/scenarios/redteam/redteam_v1.jsonl`, 8 categories x 5) and 20 benign look-alikes (`data/scenarios/redteam_benign/benign_v1.jsonl`, scenario set `redteam_benign`).
+- `bankguard/eval/redteam.py`: attack format, memo seeding into the per-attack database copy, `run_attack`, rule-graded attack goals (succeeded / complied / stopped_by), compliance judge prompt and parser, summary (ASR overall and by category, stopping layer).
+- Scripts: `run_redteam.py`, `judge_redteam.py`, `report_redteam.py`, `score_redteam_classifier.py` (local, no API calls). `run_eval.py --set` accepts every scenario set.
+- Makefile: `redteam-classifier`, `redteam-on`, `redteam-off`, `redteam-benign-on`, `redteam-benign-off`, `redteam-judge`, `redteam-report`.
+- `tests/test_redteam.py`: set validity and freeze, no overlap with dev/eval/held-out, facts match bank.db, grading signals, stopping layer, judge parsing, seeded run on a database copy.
+

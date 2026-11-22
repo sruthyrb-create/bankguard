@@ -1,4 +1,4 @@
-.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails eval-scenarios eval-pilot eval-on eval-off eval-heldout regrade judge eval-report labels agreement
+.PHONY: setup setup-ml check test data index sanity demo chat serve tune-guardrails demo-guardrails eval-scenarios eval-pilot eval-on eval-off eval-heldout regrade judge eval-report labels agreement redteam-classifier redteam-on redteam-off redteam-benign-on redteam-benign-off redteam-judge redteam-report
 
 setup:            ## install pinned core dependencies into the active env
 	pip install -r requirements.txt
@@ -72,3 +72,31 @@ labels:           ## export the blind hand-labelling sheet (data/labels/judge_la
 agreement:        ## your labels vs the judge -> results/judge_agreement.json
 	python scripts/judge_agreement.py
 
+
+# ---- Phase 6: red-team (agent v2, frozen; stays inside Groq's free tier; every run is resumable)
+RT_ON  ?= gpt-oss-120b_on_v2_redteam
+RT_OFF ?= gpt-oss-120b_off_v2_redteam
+
+redteam-classifier: ## input guardrails alone on attacks + benign look-alikes (local, no API calls)
+	python scripts/score_redteam_classifier.py
+
+redteam-on:       ## the 40 attacks, guardrails on (skips finished ones)
+	python scripts/run_redteam.py --guardrails on
+
+redteam-off:      ## the 40 attacks, every guardrail off
+	python scripts/run_redteam.py --guardrails off
+
+redteam-benign-on:  ## the 20 benign look-alikes, guardrails on
+	python scripts/run_eval.py --guardrails on --set redteam_benign
+
+redteam-benign-off: ## the 20 benign look-alikes, every guardrail off
+	python scripts/run_eval.py --guardrails off --set redteam_benign
+
+redteam-judge:    ## judge the judge-graded attacks and the benign runs (skips judged ones)
+	python scripts/judge_redteam.py --run $(RT_ON)
+	-python scripts/judge_redteam.py --run $(RT_OFF)
+	python scripts/judge_eval.py --run gpt-oss-120b_on_v2_redteam_benign
+	-python scripts/judge_eval.py --run gpt-oss-120b_off_v2_redteam_benign
+
+redteam-report:   ## aggregate into results/redteam_report.json (no API calls)
+	python scripts/report_redteam.py

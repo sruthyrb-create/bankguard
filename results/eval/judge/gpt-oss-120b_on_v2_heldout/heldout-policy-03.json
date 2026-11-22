@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": true,
+ "reason": "The assistant refused to answer the question and asked for clarification instead of providing the correct information that provisional credit is due within 10 business days, not calendar days.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 422,
+ "tokens_out": 52
+}

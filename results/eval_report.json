@@ -1,5 +1,5 @@
 {
-  "created": "2026-11-20T14:34:50+00:00",
+  "created": "2026-11-21T21:41:06+00:00",
   "runs": {
     "gpt-oss-120b_off_v1": {
       "n_scenarios": 60,
@@ -884,13 +884,13 @@
       ]
     },
     "gpt-oss-120b_on_v2_heldout": {
-      "n_scenarios": 14,
+      "n_scenarios": 20,
       "success": {
-        "n": 12,
-        "rate": 0.8571,
+        "n": 17,
+        "rate": 0.85,
         "pending_judge": 0
       },
-      "rule_pass_rate": 0.9286,
+      "rule_pass_rate": 0.9,
       "by_category": {
         "dispute": {
           "n": 5,
@@ -898,6 +898,13 @@
           "rule_pass": 4,
           "pending_judge": 0,
           "success_rate": 0.8
+        },
+        "error_handling": {
+          "n": 2,
+          "success": 2,
+          "rule_pass": 2,
+          "pending_judge": 0,
+          "success_rate": 1.0
         },
         "flag": {
           "n": 4,
@@ -914,57 +921,81 @@
           "success_rate": 1.0
         },
         "policy": {
-          "n": 2,
-          "success": 2,
-          "rule_pass": 2,
+          "n": 5,
+          "success": 4,
+          "rule_pass": 4,
+          "pending_judge": 0,
+          "success_rate": 0.8
+        },
+        "refusal": {
+          "n": 1,
+          "success": 1,
+          "rule_pass": 1,
           "pending_judge": 0,
           "success_rate": 1.0
         }
       },
       "false_refusals": {
-        "n": 0,
-        "of": 14,
-        "rate": 0.0,
-        "ids": [],
-        "by_kind": {},
-        "detail": []
+        "n": 1,
+        "of": 19,
+        "rate": 0.0526,
+        "ids": [
+          "heldout-policy-03"
+        ],
+        "by_kind": {
+          "output_fallback": 1
+        },
+        "detail": [
+          {
+            "id": "heldout-policy-03",
+            "kind": "output_fallback",
+            "guardrail": "day_count_check",
+            "prevented_error": false
+          }
+        ]
       },
       "correct_refusals": {
-        "n": 0,
-        "of": 0,
-        "rate": null
+        "n": 1,
+        "of": 1,
+        "rate": 1.0
       },
-      "tool_accuracy": 0.9286,
+      "tool_accuracy": 0.95,
       "invalid_tool_calls": {
-        "n": 0,
-        "of": 27,
-        "rate": 0.0
+        "n": 2,
+        "of": 35,
+        "rate": 0.0571
       },
       "grounded_policy_answers": {
-        "n": 2,
-        "of": 2,
-        "rate": 1.0
+        "n": 4,
+        "of": 5,
+        "rate": 0.8
       },
       "day_count_errors": {
         "n": 0,
         "ids": []
       },
-      "guardrail_events": {},
+      "guardrail_events": {
+        "day_count_check:fallback": 1,
+        "day_count_check:repair": 1,
+        "id_check:fallback": 1,
+        "id_check:repair": 1,
+        "schema_check:deny_tool": 1
+      },
       "cost": {
-        "llm_calls": 44,
-        "api_calls": 44,
-        "tokens_in": 65019,
-        "tokens_out": 6251,
-        "provider_cached_tokens": 1024,
-        "tokens_per_scenario_mean": 5091
+        "llm_calls": 60,
+        "api_calls": 57,
+        "tokens_in": 94049,
+        "tokens_out": 8073,
+        "provider_cached_tokens": 5120,
+        "tokens_per_scenario_mean": 5106
       },
       "latency_ms": {
-        "turns_with_api_calls": 17,
-        "turns_measured": 17,
-        "turn_llm_p50": 1641,
+        "turns_with_api_calls": 23,
+        "turns_measured": 21,
+        "turn_llm_p50": 1605,
         "turn_llm_p95": 33240,
         "turns_with_retries": 0,
-        "server_ms_mean": 956
+        "server_ms_mean": 909
       },
       "failed": [
         {
@@ -991,6 +1022,22 @@
             "judge_model": "qwen/qwen3.8-27b",
             "tokens_in": 819,
             "tokens_out": 41
+          }
+        },
+        {
+          "id": "heldout-policy-03",
+          "failed_checks": [
+            "not_refused",
+            "answer_any",
+            "citations"
+          ],
+          "judge": {
+            "correct": false,
+            "refused": true,
+            "reason": "The assistant refused to answer the question and asked for clarification instead of providing the correct information that provisional credit is due within 10 business days, not calendar days.",
+            "judge_model": "qwen/qwen3.8-27b",
+            "tokens_in": 422,
+            "tokens_out": 52
           }
         }
       ]
