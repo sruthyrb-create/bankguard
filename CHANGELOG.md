@@ -106,3 +106,7 @@
 - Makefile: `redteam-classifier`, `redteam-on`, `redteam-off`, `redteam-benign-on`, `redteam-benign-off`, `redteam-judge`, `redteam-report`.
 - `tests/test_redteam.py`: set validity and freeze, no overlap with dev/eval/held-out, facts match bank.db, grading signals, stopping layer, judge parsing, seeded run on a database copy.
 
+## Phase 5 closed (2026-11-22)
+- v2 runs complete: main 60 (`gpt-oss-120b_on_v2`) and held-out 20 (`gpt-oss-120b_on_v2_heldout`), judged; `results/eval_report.json` regenerated.
+- Phase 6 input-guardrail scoring on the frozen red-team sets: `results/redteam_classifier.json`.
+
