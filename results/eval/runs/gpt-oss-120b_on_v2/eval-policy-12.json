@@ -1,0 +1,125 @@
+{
+ "scenario_id": "eval-policy-12",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-23T02:41:29+00:00",
+ "turns": [
+  {
+   "user": "How do I stop a recurring payment from my account, and how much notice do I need to give?",
+   "answer": "To stop a recurring (pre‑authorized) electronic fund transfer, you can place a stop‑payment order with us:\n\n1. **Notify us** – either by phone (oral) or in writing – that you want the recurring payment stopped.  \n2. **Timing** – you must give the notice **at least three business days before the scheduled transfer date**.  \n3. **Written confirmation** – if you give an oral notice, we may ask you to confirm it in writing within 14 days; the oral order stops being binding after that period if the written confirmation isn’t received.\n\nSo, to cancel a recurring payment, contact us now (or at least three business days before the next scheduled debit) and let us know which payment you want stopped.  \n\n**Regulation E reference:** Consumer’s right to stop payment requires notice “at least three business days before the scheduled date of the transfer”【1005.10(c)#1】.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "recurring payment stop notice required Regulation E"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 3592,
+   "tokens_out": 343,
+   "latency_ms": 58328,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 2048,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1110,
+    "llm_ms": 1838,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.10(c)#1",
+  "1005.15(e)#2",
+  "1005.18(d)#2",
+  "1005.7(b)#2",
+  "1005.8(a)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.10(c)#1'], unsupported [], prefixes ['1005.10']"
+  }
+ ],
+ "rule_pass": true
+}

@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identified the 60-day reporting window for unauthorized transactions on a statement, consistent with the reference and Regulation E, without inventing facts or refusing to help.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 550,
+ "tokens_out": 54
+}

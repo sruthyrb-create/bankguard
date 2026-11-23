@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identifies the 10 business day, 45 calendar day, and 90 day timelines as specified in the reference, and the additional details provided are consistent with Regulation E.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 768,
+ "tokens_out": 59
+}

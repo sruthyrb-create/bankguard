@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly states the three-business-day deadline for reporting investigation results as specified in the reference and Regulation E.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 467,
+ "tokens_out": 41
+}

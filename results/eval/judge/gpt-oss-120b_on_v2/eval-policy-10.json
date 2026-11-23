@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly states that the bank may require written confirmation within 10 business days and must provide the address, which is consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 468,
+ "tokens_out": 49
+}

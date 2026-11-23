@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": true,
+ "reason": "The assistant correctly declined to provide tax advice as per the reference, which is a valid refusal for scope reasons.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 349,
+ "tokens_out": 41
+}

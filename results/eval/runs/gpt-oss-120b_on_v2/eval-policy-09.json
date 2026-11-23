@@ -1,0 +1,120 @@
+{
+ "scenario_id": "eval-policy-09",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-23T02:38:29+00:00",
+ "turns": [
+  {
+   "user": "What counts as an error under Regulation E?",
+   "answer": "Under Regulation E, an “error” is defined as any of the following situations:\n\n1. **An unauthorized electronic fund transfer** – a transfer you did not approve.  \n2. **An incorrect electronic fund transfer** – the amount sent to or from your account is wrong.  \n3. **The omission of an electronic fund transfer from a periodic statement** – a transfer that should appear on your statement is missing.  \n4. **A computational or bookkeeping error made by the financial institution** relating to an electronic fund transfer.  \n5. **The receipt of an incorrect amount of money from an electronic terminal** – e.g., an ATM gave you the wrong cash amount.  \n6. **An electronic fund transfer not identified in accordance with the required notice procedures** ( §§ 1005.9 or 1005.10(a) ).  \n7. **A consumer’s request for documentation or clarification about a transfer** to determine whether an error exists under any of the above categories.\n\nThese items together constitute what Regulation E treats as an “error.” [1005.11(a)#1]",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E error definition"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 3331,
+   "tokens_out": 371,
+   "latency_ms": 2271,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 1024,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 865,
+    "llm_ms": 1274,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.1(a)#1",
+  "1005.11(a)#1",
+  "1005.15(e)#2",
+  "1005.15(e)#4",
+  "1005.8(b)#1"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(a)#1'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": true
+}

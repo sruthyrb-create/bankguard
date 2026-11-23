@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": true,
+ "reason": "The assistant refused to answer the question and asked for clarification instead of providing the specific timing required by the reference (10 business days).",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 417,
+ "tokens_out": 46
+}

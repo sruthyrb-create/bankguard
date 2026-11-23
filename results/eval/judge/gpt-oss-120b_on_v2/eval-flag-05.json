@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly stated that the transaction could not be found on the account and did not reveal any details or flag it, consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 448,
+ "tokens_out": 48
+}

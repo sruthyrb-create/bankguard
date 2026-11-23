@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly stated the requirement to notify the bank at least three business days before the scheduled transfer and that written confirmation may be required within 14 days of an oral notice, which is fully consistent with the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 603,
+ "tokens_out": 63
+}

@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant failed to mention that the standard 10-business-day investigation period is extended to 20 business days for accounts opened within 30 days, which is a key fact required by the reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 610,
+ "tokens_out": 61
+}

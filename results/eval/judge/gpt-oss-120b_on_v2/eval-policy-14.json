@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly states that the bank is not required to provide provisional credit if written confirmation is not received within 10 business days, which aligns perfectly with the provided reference.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 515,
+ "tokens_out": 55
+}

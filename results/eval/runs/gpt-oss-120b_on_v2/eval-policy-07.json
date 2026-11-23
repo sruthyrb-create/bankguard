@@ -1,0 +1,125 @@
+{
+ "scenario_id": "eval-policy-07",
+ "category": "policy",
+ "account": "ACC-0001",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-23T02:37:27+00:00",
+ "turns": [
+  {
+   "user": "My account was opened two weeks ago. Does the bank get extra time to investigate an error?",
+   "answer": "Under Regulation E, a bank must investigate an error within 10 business days of receiving your notice and report the result within 3 business days. If it can’t finish the investigation in that time, it may take up to 45 days, provided it gives you a provisional credit within the first 10 business days [1005.11(c)#1].\n\nBecause your account was opened only two weeks ago—i.e., the error occurred within 30 days of the first deposit—the bank is allowed an even longer window. In that situation the investigation period can be extended to **90 days** instead of 45 days [1005.11(c)#3].\n\nSo yes, the bank gets extra time (up to 90 days) to investigate an error on a newly‑opened account.",
+   "tool_calls": [
+    {
+     "tool": "search_policy",
+     "args": {
+      "k": 5,
+      "query": "Regulation E investigation time error bank extra time to investigate error"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 3368,
+   "tokens_out": 502,
+   "latency_ms": 4345,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 0,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1204,
+    "llm_ms": 2073,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [
+  "1005.11(b)#2",
+  "1005.11(c)#1",
+  "1005.11(c)#2",
+  "1005.11(c)#3",
+  "1005.15(e)#4"
+ ],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  },
+  {
+   "check": "tools_required",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "answer_any",
+   "passed": false,
+   "detail": "none of [['20 business days', 'twenty business days']]"
+  },
+  {
+   "check": "citations",
+   "passed": true,
+   "detail": "cited ['1005.11(c)#1', '1005.11(c)#3'], unsupported [], prefixes ['1005.11']"
+  }
+ ],
+ "rule_pass": false
+}

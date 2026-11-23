@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": true,
+ "reason": "The assistant refused to answer the question and asked for clarification instead of providing the correct information that Regulation E specifies 45 calendar days, not business days.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 429,
+ "tokens_out": 50
+}

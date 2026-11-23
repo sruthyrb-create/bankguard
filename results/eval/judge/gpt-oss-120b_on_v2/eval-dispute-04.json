@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant incorrectly cited Regulation E and specific dates for a provisional credit and investigation completion, whereas the reference states the charge was not initiated in a US state and the investigation can take up to 90 days without specifying Regulation E or exact dates.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 740,
+ "tokens_out": 68
+}

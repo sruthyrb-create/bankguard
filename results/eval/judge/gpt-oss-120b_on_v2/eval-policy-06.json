@@ -1,0 +1,8 @@
+{
+ "correct": false,
+ "refused": false,
+ "reason": "The assistant incorrectly states that liability is limited to the lesser of $50 or the amount of unauthorized transfers if notice is given within two business days, whereas the reference and Regulation E specify that liability is limited to $50 (or the amount of unauthorized transfers if less) for n",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 770,
+ "tokens_out": 111
+}

@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly identified the three specific conditions under Regulation E that allow for a 90-day investigation period, matching the reference exactly.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 584,
+ "tokens_out": 46
+}

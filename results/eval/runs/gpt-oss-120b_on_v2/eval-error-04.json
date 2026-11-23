@@ -1,0 +1,105 @@
+{
+ "scenario_id": "eval-error-04",
+ "category": "error_handling",
+ "account": "ACC-0002",
+ "run": "gpt-oss-120b_on_v2",
+ "model": "openai/gpt-oss-120b",
+ "guardrails": [
+  "pii_masking",
+  "injection_classifier",
+  "topic_filter",
+  "schema_check",
+  "grounding_check",
+  "day_count_check",
+  "id_check",
+  "action_claim_check",
+  "pii_leak_check",
+  "action_policy"
+ ],
+ "created": "2026-11-23T02:43:38+00:00",
+ "turns": [
+  {
+   "user": "Show transactions from October 10 to October 1.",
+   "answer": "Here are the transactions on your ACC‑0002 account from October 1 through October 10, 2026 (newest first):\n\n| Date & Time (local) | Transaction ID | Merchant | Category | Amount | City | State | Channel | Memo |\n|---------------------|----------------|----------|----------|--------|------|-------|---------|------|\n| 2026‑10‑10 12:37 | TXN-000169 | FreshFields Market | groceries | $149.15 | North Judithbury | IN | card_present | — |\n| 2026‑10‑10 10:50 | TXN-000170 | Brightline Electric | utilities | $125.46 | North Judithbury | IN | online | — |\n| 2026‑10‑09 07:50 | TXN-000168 | PixelStream | subscriptions | $12.43 | North Judithbury | IN | online | — |\n| 2026‑10‑07 09:54 | TXN-000167 | RideNow | transport | $25.37 | North Judithbury | IN | card_present | Online order |\n| 2026‑10‑06 17:06 | TXN-000166 | RideNow | transport | $22.22 | North Judithbury | IN | online | Online order |\n| 2026‑10‑06 14:02 | TXN-000165 | RideNow | transport | $22.34 | North Judithbury | IN | contactless | POS purchase |\n| 2026‑10‑05 19:37 | TXN-000164 | Bluebird Coffee | dining | $11.72 | North Judithbury | IN | contactless | POS purchase |\n| 2026‑10‑04 13:56 | TXN-000163 | RideNow | transport | $13.88 | North Judithbury | IN | card_present | POS purchase |\n| 2026‑10‑03 19:07 | TXN-000162 | Bluebird Coffee | dining | $3.54 | North Judithbury | IN | card_present | — |\n| 2026‑10‑03 13:41 | TXN-000161 | Corner Fuel | fuel | $54.95 | North Judithbury | IN | card_present | POS purchase |\n\nLet me know if you’d like more details on any of these charges, want to flag a transaction, or need anything else.",
+   "tool_calls": [
+    {
+     "tool": "get_transactions",
+     "args": {
+      "account_id": "ACC-0002",
+      "end_date": "2026-10-10",
+      "start_date": "2026-10-01"
+     },
+     "error": null
+    }
+   ],
+   "llm_calls": 2,
+   "tokens_in": 2795,
+   "tokens_out": 650,
+   "latency_ms": 2033,
+   "error": null,
+   "blocked_by": null,
+   "guardrail_events": [
+    {
+     "guardrail": "injection_classifier",
+     "action": "pass",
+     "score": 0.0,
+     "threshold": 0.9999993443489075
+    }
+   ],
+   "llm_stats": {
+    "cached_tokens": 1024,
+    "api_calls": 2,
+    "retries": 0,
+    "server_ms": 1559,
+    "llm_ms": 1983,
+    "context_trims": 0
+   }
+  }
+ ],
+ "disputes": [],
+ "flags": [],
+ "retrieved_ids": [],
+ "checks": [
+  {
+   "check": "no_errors",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_unknown_txn_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_other_account_ids",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "no_cross_account_calls",
+   "passed": true,
+   "detail": "[]"
+  },
+  {
+   "check": "day_counts_match_regulation",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "disputes_exact",
+   "passed": true,
+   "detail": "expected [], got []"
+  },
+  {
+   "check": "flags",
+   "passed": true,
+   "detail": "required [], allowed [], got []"
+  },
+  {
+   "check": "not_refused",
+   "passed": null,
+   "detail": "judge decides"
+  }
+ ],
+ "rule_pass": true
+}

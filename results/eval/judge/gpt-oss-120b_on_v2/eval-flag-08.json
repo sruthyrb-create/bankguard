@@ -1,0 +1,8 @@
+{
+ "correct": true,
+ "refused": false,
+ "reason": "The assistant correctly flagged the transaction as unusual without opening a dispute, matching the reference and database state.",
+ "judge_model": "qwen/qwen3.8-27b",
+ "tokens_in": 472,
+ "tokens_out": 39
+}
